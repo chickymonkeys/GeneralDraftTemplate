@@ -1,0 +1,561 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble LaTeX Style for Working Papers and Manuscripts
+% MIT-style Formatting as Adrien Auclert Job Market Paper
+% Adapted from Rebekah Dix template (@rebekahanne)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% We define the LaTeX Style as a package named preamble
+\ProvidesPackage{preamble}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% improvement packages for maths, symbols, fonts and theorems
+\usepackage{amsmath, amssymb, amsthm, amsbsy}
+\usepackage{geometry}                    % geometry
+\usepackage[usenames,dvipsnames]{xcolor} % colours
+\usepackage{mathrsfs,bbm}                % calligraphic improvements
+\usepackage{ae,aecompl}                  % better fonts
+\usepackage{csquotes}                    % recommended for babel
+\usepackage{bm}                          % bold
+\usepackage{mathpazo}                    % maths fonts to match Palatino
+
+\usepackage{setspace} % spacing
+
+% figures and tables objects
+\usepackage{graphicx}
+\usepackage{caption,subcaption} % captions
+\usepackage{multicol} % multicolumn lists
+\usepackage{multirow} % multiple rows
+\usepackage{booktabs} % pretty formatted tables \midrule etc.
+\usepackage[para]{threeparttable} % for \tablenotes as additional captions
+
+% lists
+\usepackage{paralist,enumitem}              % inline lists
+\setlist[enumerate]{itemsep=2pt,topsep=3pt} % pretty numbered lists
+\setlist[itemize]{itemsep=2pt,topsep=3pt}   % pretty unnumbered lists
+\setlist[enumerate,1]{label=(\roman*)}      % use Roman numbers to enumerate
+
+% object positioning
+\usepackage{float}       % for forcing H in floating objects and more
+
+% miscellaneous
+\usepackage[linesnumbered, lined, ruled]{algorithm2e} % algorithms
+\usepackage{pdflscape, lipsum} % landscape pages and lipsum
+\usepackage{afterpage}         % float text for landscape pages
+\usepackage{comment}           % \begin{comment} environment for multi blocks
+\usepackage{soul}              % highlight text to modify with \hl{}
+\usepackage{pdfpages}          % PDFs
+\usepackage{subfiles}          % to include snippets
+\usepackage{framed}
+\newcounter{dummy} % necessary for correct hyperlinks (to index, bib, etc.)
+
+% -----------------------------------------------------------------------------
+% Colors
+% -----------------------------------------------------------------------------
+
+\usepackage{xcolor}
+
+% standard colors
+% ------------------------------------------
+\definecolor{dkgreen}{RGB}{0,0.6,0}
+\definecolor{gray}{RGB}{0.5,0.5,0.5}
+\definecolor{mauve}{RGB}{0.58,0,0.82}
+\definecolor{blue}{RGB}{22,66,137}
+\definecolor{green}{RGB}{121,180,115}
+\definecolor{orange}{RGB}{217,83,30}
+\definecolor{lime}{RGB}{226,228,119}
+
+% MIT colors
+% ------------------------------------------
+\definecolor{red}{RGB}{163,31,52}
+\definecolor{darkgrey}{RGB}{138,139,140}
+\definecolor{lightgrey}{RGB}{194,192,191}
+
+% NHH colors
+% ------------------------------------------
+\definecolor{darkblue}{RGB}{0,57,90}
+\definecolor{lightblue}{RGB}{59,110,143}
+\definecolor{lighterblue}{RGB}{156,197,202}
+\definecolor{lightestblue}{RGB}{196,223,224}
+\definecolor{gold}{RGB}{177,149,58}
+
+% FAIR colors
+% ------------------------------------------
+\definecolor{pink}{RGB}{221, 21, 106}
+\definecolor{purple}{RGB}{108, 33, 51}
+
+% Macro-Resource colors
+% ------------------------------------------
+\definecolor{lightgreen}{RGB}{181,206,151}
+\definecolor{darkgreen}{RGB}{72,84,80}
+
+% soul package settings
+\sethlcolor{lightestblue}
+
+% -----------------------------------------------------------------------------
+% References
+% -----------------------------------------------------------------------------
+
+\usepackage[colorlinks=true, citecolor=red, linkcolor=red,%
+    filecolor=red, urlcolor=red]{hyperref} % hyper-references
+% set-up common shade for everybody
+\newcommand\myshade{85}
+
+% to set-up particular colours for the hyperlinks
+\colorlet{mylinkcolor}{red}
+\colorlet{mycitecolor}{red}
+\colorlet{myurlcolor}{red}
+
+\hypersetup{
+    linkcolor  = mylinkcolor!\myshade!red,
+    citecolor  = mycitecolor!\myshade!red,
+    urlcolor   = myurlcolor!\myshade!red,
+    colorlinks = true,
+}
+
+% we are using bibtex with natbib instead of biblatex and biber as in the
+% original format because of issues with biber and to use the AEA bibliography
+% \usepackage[semicolon,authoryear]{natbib}
+\usepackage{natbib}
+
+% -----------------------------------------------------------------------------
+% Math-Specific Packages and TikZ
+% -----------------------------------------------------------------------------
+
+\usepackage{mathtools}
+\usepackage{xparse}
+\usepackage{xfrac}
+
+% Framed theorems
+\usepackage{mdframed}
+
+% tikz from matplotlib
+\usepackage{tikz-cd}
+\usetikzlibrary{bayesnet} % Bayesian Networks Library
+\usetikzlibrary{cd}
+%\usepackage{tikz}
+%\usepackage[utf8]{inputenc}
+%\usepackage{pgfplots}
+%\pgfplotsset{compat=newest}
+%\usepgfplotslibrary{groupplots}
+%\usepgfplotslibrary{dateplot}
+
+% -----------------------------------------------------------------------------
+% TODOs Lists (create reference for the commands)
+% -----------------------------------------------------------------------------
+
+% Use more than one optional parameter in a new commands
+\usepackage{xargs}
+% Todo
+\usepackage[colorinlistoftodos,prependcaption,textsize=normalsize]{todonotes}
+\newcommandx{\unsure}[2][1=]{%
+    \todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+\newcommandx{\change}[2][1=]{
+    \todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}%
+\newcommandx{\info}[2][1=]{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}}
+\newcommandx{\improvement}[2][1=]{%
+    \todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}}
+\newcommandx{\thiswillnotshow}[2][1=]{\todo[disable,#1]{#2}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document Settings
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Matrix columns
+\setcounter{MaxMatrixCols}{10}
+
+% \usepackage{indentfirst} % indentation of first paragraph
+\onehalfspacing
+\linespread{1.3}
+
+\usepackage{alltt} % to prevent memory overflow in case of long periods
+
+% Geometry
+\geometry{letterpaper, margin=2.54cm}
+% Counters
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+
+% Appendix
+\usepackage[toc,page]{appendix}
+
+\usepackage[useregional]{datetime2} % to create new dates
+% \newcommand{\thedate}{\DTMdisplaydate{2017}{02}{21}{-1}}
+% \newcommand{\thedate}{\today}
+
+% draft disclaimer
+\newcommand{\draftdisclaimer}{\begin{center}\begin{framed} DRAFT: PLEASE DO
+            NOT CITE OR DISTRIBUTE \end{framed}\end{center}}
+
+% -----------------------------------------------------------------------------
+% Create Title
+% -----------------------------------------------------------------------------
+
+\newcommand{\subtitle}{}
+
+\providecommand{\maketitle}{}
+\renewcommand{\maketitle}{%
+    \par
+    \begingroup
+    \renewcommand{\thefootnote}{\fnsymbol{footnote}}
+    % for perfect author name centering
+    \renewcommand{\@makefnmark}{\hbox to \z@{$^{\@thefnmark}$\hss}}
+    % The footnote-mark was overlapping the footnote-text,
+    % added the following to fix this problem               (MK)
+    \long\def\@makefntext##1{%
+        \parindent 1em\noindent
+        \hbox to 1.8em{\hss $\m@th ^{\@thefnmark}$}##1
+    }
+    \thispagestyle{empty}
+    \@maketitle
+    \@thanks
+    \endgroup
+    \let\maketitle\relax
+    \let\thanks\relax
+}
+
+% create title (includes both anonymized and non-anonymized versions)
+\providecommand{\@maketitle}{}
+\renewcommand{\@maketitle}{%
+    \vbox{%
+        \centering
+        % main title as big as possible
+        {\LARGE\bf \@title\par}
+        % conditioning for the subtitle
+        \ifthenelse{\equal{\subtitle}{}}{%
+            \vskip 0.1in%
+        }{%
+            \vskip 0.1in%
+                {\Large \subtitle}\\%
+            \vskip 0.1in%
+        }%
+        \def\And{%
+            \end{tabular}\hfil\linebreak[0]\hfil%
+            \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\ignorespaces%
+                }
+                \def\AND{%
+            \end{tabular}\hfil\linebreak[4]\hfil%
+            \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\ignorespaces%
+        }
+        \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\@author\end{tabular}%
+        \vskip 0.2in \@minus 0.1in \center{\@date}   \vskip 0.1in
+    }
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figures and Tables
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Colors
+\newcommand{\defi}[1]{\textcolor{blue}{\bf #1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Environments
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\theoremstyle{definition}
+\newtheorem{theorem}{\color{green}{\textbf{Theorem}}}[section]
+\newtheorem{claim}{\color{green}{\textbf{Claim}}}[section]
+\newtheorem{lemma}[theorem]{\color{green}{\textbf{Lemma}}}
+\newtheorem{proposition}[theorem]{\color{green}{\textbf{Proposition}}}
+\newtheorem{corollary}[theorem]{\color{green}{\textbf{Corollary}}}
+\newtheorem{axiom}[theorem]{\color{green}{\textbf{Axiom}}}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{case}[theorem]{Case}
+\newtheorem{conclusion}[theorem]{Conclusion}
+\newtheorem{criterion}[theorem]{Criterion}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{calculation}[theorem]{Calculation}
+
+\theoremstyle{definition}
+\newtheorem{definition}{\color{blue}{\textbf{Definition}}}[section]
+\newtheorem{example}{\color{purple}Example}[section]
+\newtheorem{assumption}{Assumption}[section]
+\newtheorem{condition}[assumption]{Condition}
+\newtheorem*{solution}{\color{Goldenrod}Solution}
+% \newenvironment{solution}[1][\proofname]{%
+%   \proof[\bf \color{Goldenrod}Solution to #1]%
+% }{\endproof}
+
+\newtheorem{exercise}{\color{ruby}Exercise}[section]
+
+% Literature Summary Standards
+\newtheorem*{motivation}{Motivation}
+\newtheorem*{question}{Research Question}
+\newtheorem*{summary}{Summary}
+\newtheorem*{remark}{Remark}
+\newtheorem*{model}{Model}
+\newtheorem*{data}{Data}
+\newtheorem*{emethod}{Empirical Methodology}
+\newtheorem*{tresults}{Theoretical Results}
+\newtheorem*{eresults}{Empirical Results}
+\newtheorem*{interpretation}{Interpretation}
+\newtheorem*{litconnect}{Place in Literature}
+\newtheorem*{lit}{Literature}
+\newtheorem*{limitations}{Limitations}
+\newtheorem*{extend}{Extensions}
+\newtheorem*{policy}{Policy}
+\newtheorem*{proofstr}{Proof Strategy}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Maths macros
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Underbrace
+\newcommand\ub[2]{\underbrace{#1}_{#2}}
+\newcommand\ubt[2]{\underbrace{#1}_{\text{#2}}}
+\newcommand\obt[2]{\overbrace{#1}^{\text{#2}}}
+
+% Textcolors
+\newcommand\tcb[1]{\textcolor{blue}{#1}}
+\newcommand\tclb[1]{\textcolor{lightblue}{#1}}
+\newcommand\tcr[1]{\textcolor{ruby}{#1}}
+\newcommand\tcg[1]{\textcolor{green}{#1}}
+\newcommand\tcpr[1]{\textcolor{purple}{#1}}
+
+% Math ``brackets''
+\newcommand\parens[1]{\left( #1 \right)}
+\newcommand\squares[1]{\left[ #1 \right]}
+\newcommand\braces[1]{\left\{ #1 \right\}}
+\newcommand\angles[1]{\left\langle #1 \right\rangle}
+\newcommand\ceil[1]{\left\lceil #1 \right\rceil}
+\newcommand\floor[1]{\left\lfloor #1 \right\rfloor}
+\newcommand\abs[1]{\left| #1 \right|}
+\newcommand\dabs[1]{\left\| #1 \right\|}
+\newcommand\vect[1]{\mathbf{#1}}
+\newcommand\closure[1]{\overline{#1}}
+\newcommand\pset[1]{\mathcal{P}\left(#1\right)}
+\newcommand\inv[1]{#1^{-1}}
+\newcommand\norm[1]{\lVert#1\rVert}
+
+% variations of \frac and \sfrac
+\newcommand{\pfrac}[2]{\parens{\frac{#1}{#2}}} % enclosed in parentheses
+\newcommand{\bfrac}[2]{\squares{\frac{#1}{#2}}} % enclosed in square brackets
+\newcommand{\psfrac}[2]{\pa{\sfrac{#1}{#2}}} % sfrac enclosed in parentheses
+\newcommand{\bsfrac}[2]{\squares{\sfrac{#1}{#2}}} % sfrac enclosed in square brackets
+
+% Derivatives
+\newcommand{\td}[2]{\frac{d #1}{d #2}}
+\newcommand{\pd}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\ptd}[2]{\frac{\partial^2 #1}{\partial #2^2}}
+\newcommand{\pthd}[2]{\frac{\partial^3 #1}{\partial #2^3}}
+\newcommand{\ptmd}[3]{\frac{\partial^2 #1}{\partial #2 \partial #3}}
+
+% Matrices
+\newcommand{\bmat}[1]{\begin{bmatrix}#1\end{bmatrix}}
+\newcommand{\pmat}[1]{\begin{pmatrix}#1\end{pmatrix}}
+
+% for small matrices to be used in in-line expressions
+\newcommand{\sm}[1]{\begin{smallmatrix}#1\end{smallmatrix}} % no delimiters
+\newcommand{\psm}[1]{\parens{\sm{#1}}} % parentheses as delimiters
+\newcommand{\bsm}[1]{\squares{\sm{#1}}} % square brackets as delimiters
+
+% inner product
+\providecommand{\inner}[1]{\left\langle{#1}\right\rangle}
+% stochastic dominance
+\newcommand{\lesd}{\preceq_{\textrm{SD}}}
+
+% Set builder (use \Set ultimately and separate by ;
+\DeclarePairedDelimiterX{\set}[1]{\{}{\}}{\setargs{#1}}
+\NewDocumentCommand{\setargs}{>{\SplitArgument{1}{;}}m}
+{\setargsaux#1}
+\NewDocumentCommand{\setargsaux}{mm}
+{\IfNoValueTF{#2}{#1} {#1\nonscript\:\delimsize\vert\allowbreak\nonscript\:\mathopen{}#2}}%
+\def\Set{\set*}%
+
+% Shortcut math
+\newcommand{\ls}{\leqslant}
+\newcommand{\gs}{\geqslant}
+\def\ss{\subset}
+\def\sse{\subseteq}
+\def\nss{\not \ss}
+\def\nin{\not \in}
+\def\sps{\supset}
+\def\pss{\subsetneq}
+\def\prece{\preccurlyeq}
+\def\condgap{\hspace{1cm}}
+\def\eprec{\preceq}
+% argmax and min
+\newcommand{\argmax}{\operatornamewithlimits{argmax}}
+\newcommand{\argmin}{\operatornamewithlimits{argmin}}
+\newcommand{\es}{\emptyset}
+% Implication and reverse implication
+\def\imp{\Rightarrow}
+\def\pmi{\Leftarrow}
+% Integers up to number
+\newcommand\intsfin[1]{\braces{1, \ldots, #1}}
+% Logic
+\def\bic{\Leftrightarrow}
+% Bold and italic
+\newcommand\boldit[1]{\textbf{\textit{#1}}}
+
+% Misc math
+%\newcommand{\st}{\ensuremath{\ \mathrm{s.t.}\ }}
+\newcommand{\setntn}[2]{ \{ #1 : #2 \} }
+\newcommand{\cf}[1]{ \lstinline|#1| }
+\newcommand{\fore}{\therefore \quad}
+\newcommand{\tod}{\stackrel { d } {\to} }
+\newcommand{\tow}{\stackrel { w } {\to} }
+\newcommand{\toprob}{\stackrel { p } {\to} }
+\newcommand{\toms}{\stackrel { ms } {\to} }
+\newcommand{\eqdist}{\stackrel{d} {=} }
+\newcommand{\iidsim}{\stackrel{\textrm{ {\sc iid }}} {\sim} }
+\newcommand{\1}{\mathbbm 1}
+\newcommand{\dee}{\,{\rm d}}
+\newcommand{\given}{\, | \,}
+\newcommand{\la}{\langle}
+\newcommand{\ra}{\rangle}
+% Indicator
+\newcommand{\ind}[1]{\mathbf{1}\parens{#1}}
+
+
+% PDE
+\newcommand{\pa}{\partial}
+
+% Shorcut vectors
+\def\vx{\vect{x}}
+\def\vy{\vect{y}}
+\def\va{\vect{a}}
+\def\vb{\vect{b}}
+\def\vn{\vect{n}}
+\def\vF{\vect{F}}
+
+% Shortcut modified capitals
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cB}{\mathcal{B}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cD}{\mathcal{D}}
+\newcommand{\cE}{\mathcal{E}}
+\newcommand{\cF}{\mathcal{F}}
+\newcommand{\cG}{\mathcal{G}}
+\newcommand{\cH}{\mathcal{H}}
+\newcommand{\cI}{\mathcal{I}}
+\newcommand{\cJ}{\mathcal{J}}
+\newcommand{\cK}{\mathcal{K}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cM}{\mathcal{M}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cO}{\mathcal{O}}
+\newcommand{\cP}{\mathcal{P}}
+\newcommand{\cQ}{\mathcal{Q}}
+\newcommand{\cS}{\mathcal{S}}
+\newcommand{\cT}{\mathcal{T}}
+\newcommand{\cU}{\mathcal{U}}
+\newcommand{\cV}{\mathcal{V}}
+\newcommand{\cX}{\mathcal{X}}
+\newcommand{\cY}{\mathcal{Y}}
+\newcommand{\cZ}{\mathcal{Z}}
+
+\newcommand{\bA}{\mathbb{A}}
+\newcommand{\bB}{\mathbb{B}}
+\newcommand{\bC}{\mathbb{C}}
+\newcommand{\bD}{\mathbb{D}}
+\newcommand{\bE}{\mathbb{E}}
+\newcommand{\bF}{\mathbb{F}}
+\newcommand{\bG}{\mathbb{G}}
+\newcommand{\bH}{\mathbb{H}}
+\newcommand{\bI}{\mathbb{I}}
+\newcommand{\bJ}{\mathbb{J}}
+\newcommand{\bK}{\mathbb{K}}
+\newcommand{\bM}{\mathbb{M}}
+\newcommand{\bN}{\mathbb{N}}
+\newcommand{\bO}{\mathbb{O}}
+\newcommand{\bP}{\mathbb{P}}
+\newcommand{\bQ}{\mathbb{Q}}
+\newcommand{\bR}{\mathbb{R}}
+\newcommand{\bS}{\mathbb{S}}
+\newcommand{\bT}{\mathbb{T}}
+\newcommand{\bU}{\mathbb{U}}
+\newcommand{\bV}{\mathbb{V}}
+\newcommand{\bX}{\mathbb{X}}
+\newcommand{\bY}{\mathbb{Y}}
+\newcommand{\bZ}{\mathbb{Z}}
+
+\newcommand{\sA}{\mathsf{A}}
+\newcommand{\sC}{\mathsf{C}}
+\newcommand{\sD}{\mathsf{D}}
+\newcommand{\sE}{\mathsf{E}}
+\newcommand{\sF}{\mathsf{F}}
+\newcommand{\sG}{\mathsf{G}}
+\newcommand{\sH}{\mathsf{H}}
+\newcommand{\sI}{\mathsf{I}}
+\newcommand{\sJ}{\mathsf{J}}
+\newcommand{\sK}{\mathsf{K}}
+\newcommand{\sM}{\mathsf{M}}
+\newcommand{\sN}{\mathsf{N}}
+\newcommand{\sO}{\mathsf{O}}
+\newcommand{\sP}{\mathsf{P}}
+\newcommand{\sQ}{\mathsf{Q}}
+\newcommand{\sR}{\mathsf{R}}
+\newcommand{\sS}{\mathsf{S}}
+\newcommand{\sT}{\mathsf{T}}
+\newcommand{\sU}{\mathsf{U}}
+\newcommand{\sV}{\mathsf{V}}
+\newcommand{\sX}{\mathsf{X}}
+\newcommand{\sY}{\mathsf{Y}}
+\newcommand{\sZ}{\mathsf{Z}}
+
+\newcommand{\CC}{\mathbbm C}
+\newcommand{\FF}{\mathbbm F}
+\newcommand{\RR}{\mathbbm R}
+\newcommand{\NN}{\mathbbm N}
+\newcommand{\PP}{\mathbbm P}
+\newcommand{\EE}{\mathbbm E}
+\newcommand{\TT}{\mathbbm T}
+\newcommand{\VV}{\mathbbm V}
+\newcommand{\QQ}{\mathbbm Q}
+\newcommand{\WW}{\mathbbm W}
+\newcommand{\ZZ}{\mathbbm Z}
+\newcommand{\II}{\mathbbm I}
+\renewcommand{\SS}{\mathbbm S}
+
+% Common closures
+\def\clA{\closure{A}}
+\def\clB{\closure{B}}
+\def\clK{\closure{K}}
+
+% operators
+\DeclareMathOperator{\cl}{cl}
+\DeclareMathOperator{\graph}{graph}
+\DeclareMathOperator{\interior}{int}
+\DeclareMathOperator{\Prob}{Prob}
+\DeclareMathOperator{\determinant}{det}
+\DeclareMathOperator{\trace}{trace}
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\proj}{proj}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\cov}{\bC ov}
+\DeclareMathOperator{\corr}{\bC orr}
+\DeclareMathOperator{\var}{\bV ar}
+\DeclareMathOperator{\mse}{mse}
+\DeclareMathOperator{\se}{se}
+\DeclareMathOperator{\row}{row}
+\DeclareMathOperator{\col}{col}
+\DeclareMathOperator{\range}{rng}
+\DeclareMathOperator{\kernel}{ker}
+\DeclareMathOperator{\dimension}{dim}
+\DeclareMathOperator{\bias}{bias}
+\DeclareMathOperator{\dom}{dom}
+\DeclareMathOperator{\ran}{ran}
+\DeclareMathOperator{\Int}{Int}
+\DeclareMathOperator{\Cl}{Cl}
+\DeclareMathOperator{\dive}{div}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\im}{im}
+\DeclareMathOperator{\supp}{Supp}
+
+%\newcommand{\var}[1]{\text{Var}\parens{#1}}
+%\newcommand{\cov}[1]{\text{Cov}\parens{#1}}
+% \newcommand{\corr}[1]{\text{Corr}\parens{#1}}
+\renewcommand{\exp}[1]{\text{exp}\parens{#1}}
+
+% Distributions
+% Normal
+\newcommand{\normal}[2]{\cN\parens{#1, #2}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
