@@ -1,0 +1,22 @@
+\begin{table}[ht!]
+  \centering
+  \caption{Granger Causality Tests for VAR Model}
+  \label{tab:gvar}
+  \resizebox{\textwidth}{!}{%
+    \begin{tabular}{@{}lcccccc@{}}
+      \hline \hline
+      Regressor     & Inflation & M2    & Output & Unemployment & Exchange rate & Interest rate \\ \hline
+      Inflation     & ---       & 0.000 & 0.076  & 0.510        & 0.162         & 0.493         \\
+      M2            & 0.004     & ---   & 0.017  & 0.555        & 0.000         & 0.036         \\
+      Output        & 0.045     & 0.078 & ---    & 0.153        & 0.000         & 0.000         \\
+      Unemployment  & 0.010     & 0.049 & 0.405  & ---          & 0.019         & 0.040         \\
+      Exchange rate & 0.131     & 0.001 & 0.097  & 0.973        & ---           & 0.158         \\
+      Interest rate & 0.007     & 0.000 & 0.014  & 0.000        & 0.000         & ---           \\ \hline \hline
+    \end{tabular}%
+  }
+  \begin{tablenotes}
+    \small
+    \item \textbf{Note:} All entries are chi-square test statistics at dregress of freedom with an indicate significant at 1\%, 5\% and 10\% levels, parentheses are $P$-values. The row labeled \textit{Regressor} do not enter the reduced form equation for column variable labeled \textit{Dependent Variable}. The results were computed from a VAR with four lags and a constant term over the 2010Q1--2021:Q2 sample period.
+  \end{tablenotes}
+
+\end{table}

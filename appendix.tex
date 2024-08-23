@@ -1,0 +1,213 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document-Specific Settings
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt]{article}
+
+% include style package preamble
+\usepackage{preamble}
+
+% Babel dictionaries, include the languages I use in the paper
+\usepackage[main=british]{babel}
+
+% relative pathnames for figures and tables
+\newcommand*{\TablesPath}{./tables/}
+\makeatletter
+\newcommand*\ExpandableInput[1]{\@@input#1 }
+\makeatother
+\graphicspath{ {../../res/figures/}{./figures/} } % Figures Path
+
+% High-Res Pictures Option
+\DeclareGraphicsExtensions{.pdf, .png}
+
+%----------------------------------------------------------------------------- %
+%   External Appendix                                                          %
+%----------------------------------------------------------------------------- %
+
+\usepackage{xr}
+\ifx\me\usrtest
+    \externaldocument{main}
+\else
+    \overleafextdocument{main}
+\fi
+\usepackage[toc,page]{appendix}
+
+% ------------------------------------------------------------------------------
+%   Data loader from .dat files
+% ------------------------------------------------------------------------------
+% Trick to import numbers from replication into the document and captions.
+\usepackage{datatool}
+\DTLsetseparator{;} % Set the separator between the columns.
+% Loads mydata.dat with column headers 'thekey' and 'thevalue'
+\DTLloaddb[noheader, keys={thekey;thevalue}]{scalars}{export_scalars.dat}
+% Command to include the number in the text
+\newcommand{\scalarinput}[1]{\DTLfetch{scalars}{thekey}{#1}{thevalue}}
+
+% -----------------------------------------------------------------------------%
+%   References path handler between overleaf projects and local                %
+% -----------------------------------------------------------------------------%
+% small snippet of code from stack overflow that allows me to assign the correct
+% pathname for the references directory when using my local system instead of
+% Overleaf when working with others. We also insert a quick hack for cross-
+% referencing external documents in overleaf, otherwise the xr package breaks.
+% https://tex.stackexchange.com/questions/107864/ifusername-foo-else-fi
+
+\usepackage{catchfile}
+
+% #1 = control sequence to define
+% #2 = variable to get the value of
+\newcommand{\getvar}[2]{%
+    \CatchFileEdef#1{"|kpsewhich -var-value #2"}{\endlinechar=-1 }%
+}
+
+% specify your username locally
+\def\me{dubidub}
+\getvar{\usrtest}{USER}
+
+\ifx\me\usrtest
+    \newcommand*{\RefsPath}{../references}
+\else
+    \newcommand*{\RefsPath}{docs/references}
+    \makeatletter
+    \newcommand*{\addFileDependency}[1]{% argument=file name and extension
+      \typeout{(#1)}
+      \@addtofilelist{#1}
+      \IfFileExists{#1}{}{\typeout{No file #1.}}
+    }
+    \makeatother
+    
+    \newcommand*{\overleafextdocument}[1]{%
+        \externaldocument{#1}%
+        \addFileDependency{#1.tex}%
+        \addFileDependency{#1.aux}%
+    }
+\fi
+
+%----------------------------------------------------------------------------- %
+%   Working Paper Metadata                                                     %
+%----------------------------------------------------------------------------- %
+
+% Citation Aliases (if any)
+% 10.5684/soep-core.v35
+
+% Dates
+\usepackage[useregional]{datetime2}
+% if I want to insert a specific date
+\newcommand{\thedate}{\DTMdisplaydate{2017}{02}{21}{-1}}
+\newcommand{\monthyeardate}{%
+  \DTMenglishmonthname{\@dtm@month} \@dtm@year
+}
+
+% Here you can change the date presented in the paper title
+% If I want a specific date I put in the date
+% \date{This Version: \thedate}
+% or if I want the date of today I just insert
+\date{This Version: \today}
+% or if I want just month and year
+% \date{This Version: \monthyeardate}
+% or I just remove it
+%\date{}
+
+% main title 
+\title{Insert a Nice Title here with Title Case\thanks{Acknowledgements with \lipsum[2]. Use footnote for providing further information about author (webpage, alternative address) \emph{and} funding agencies.}}
+% optional subtitle, leave empty if you dont want it
+\renewcommand{\subtitle}{Online Appendix}
+
+\author{
+    {David S.~Hippocampus}\thanks{Department of Computer Science, Pittsburgh, PA 15213, \texttt{hippo@cs.cranberry-lemon.edu}.} \\
+    Department of Computer Science\\
+    Cranberry-Lemon University\\
+    %Pittsburgh, PA 15213 \\
+    \texttt{hippo@cs.cranberry-lemon.edu} \\
+    %% examples of more authors
+    \And
+    {Elias D.~Striatum}\thanks{Department of Electrical Engineering, Santa Narimana, Levand, \texttt{stariate@ee.mount-sheikh.edu}.} \\
+    Department of Electrical Engineering\\
+    Mount-Sheikh University\\
+    %Santa Narimana, Levand \\
+    \texttt{stariate@ee.mount-sheikh.edu} \\
+    \AND
+    {Elias D.~Striatum}\thanks{Department of Electrical Engineering, Santa Narimana, Levand, \texttt{stariate@ee.mount-sheikh.edu}.} \\
+    Department of Electrical Engineering\\
+    Mount-Sheikh University\\
+    %Santa Narimana, Levand \\
+    \texttt{stariate@ee.mount-sheikh.edu} \\
+    %% \And
+    %% Coauthor \\
+    %% Affiliation \\
+    %% Address \\
+    %% \texttt{email} \\
+    %% \And
+    %% Coauthor \\
+    %% Affiliation \\
+    %% Address \\
+    %% \texttt{email} \\
+}
+
+%%% Add PDF metadata to help others organize their library
+%%% Once the PDF is generated, you can check the metadata with
+%%% $ pdfinfo template.pdf
+\hypersetup{
+    pdftitle={Insert a Nice Title here with Title Case},
+    pdfsubject={q-bio.NC, q-bio.QM},
+    pdfauthor={David S.~Hippocampus, Elias D.~Striatum},
+    pdfkeywords={First keyword, Second keyword, More},
+}
+
+%----------------------------------------------------------------------------- %
+%   TITLE PAGE                                                                 %
+%----------------------------------------------------------------------------- %
+
+\begin{document}
+\maketitle
+
+\renewcommand{\thefootnote}{\arabic{footnote}}
+\setcounter{footnote}{0}
+
+%----------------------------------------------------------------------------- %
+%  TABLE OF CONTENTS                                                           %
+%----------------------------------------------------------------------------- %
+
+\tableofcontents
+\listoftodos
+
+\clearpage
+\newpage
+
+%----------------------------------------------------------------------------- %
+%   APPENDIX                                                                   %
+%----------------------------------------------------------------------------- %
+
+\appendix
+%	\part*{Appendix}\label{app:dix}
+\pagenumbering{Arabic}
+\renewcommand*{\thepage}{A\arabic{page}}
+\numberwithin{equation}{section}
+\renewcommand{\thetable}{A\arabic{table}}
+\renewcommand{\thefigure}{A\arabic{figure}}
+
+\vspace{-3em}
+
+\tableofcontents	
+
+%-------------------------------------------------------------------	  
+\section{Data Appendix}\label{app:b}
+%-------------------------------------------------------------------	
+In this section, I deliver additional tables of summary statistics for macro data and microdata used as monetary policy shocks, macroeconomic and financial aggregates, and household wealth through three monetary policy channels. First, I present macro data, and then I give detailed statistics on the level of households. Finally, I show the histogram of the distribution of household wealth across the country and the region. 
+
+%----------------------------------------------------------------------------- %
+%   REFERENCES                                                                 %
+%----------------------------------------------------------------------------- %
+
+\clearpage\newpage
+\bibliographystyle{aea}
+%\bibliography{\RefsPath/references,\RefsPath/otherreferences}
+\bibliography{references}
+% \printbibliography
+\clearpage
+
+%----------------------------------------------------------------------------- %
+%   END DOCUMENT                                                               %
+%----------------------------------------------------------------------------- %
+
+\end{document}
