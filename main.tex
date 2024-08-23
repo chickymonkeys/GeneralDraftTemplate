@@ -14,7 +14,7 @@
 %\setuptodonotes{disable}
 
 % use endfloat package for tables' and figures' placeholders, that puts all
-% figures and tables at te end of the document.
+% figures and tables at te end of the document. Comment if you do not want it.
 \usepackage[nolists,heads]{endfloat}
 % little hack to make `endfloat` text in caps
 \renewcommand\figureplace{\MakeUppercase{\floatplace{figure}}}
@@ -61,9 +61,13 @@
 % Trick to import numbers from replication into the document and captions.
 \usepackage{datatool}
 \DTLsetseparator{;} % Set the separator between the columns.
-% Loads mydata.dat with column headers 'thekey' and 'thevalue'
+% Loads mydata.dat with column headers 'thekey' and 'thevalue'. It can load
+% multiple 'database', but they need to have different name. Here the name
+% assigned to this dataset is scalars.
 \DTLloaddb[noheader, keys={thekey,thevalue}]{scalars}{export_scalars.dat}
-% Command to include the number in the text
+% Command to include the number in the text. There should be a command like
+% this for each dataset imported, such that they do not overlap and they can
+% be used in the text easily, specifying the anchor name of the 'database'.
 \newcommand{\scalarinput}[1]{\DTLfetch{scalars}{thekey}{#1}{thevalue}}
 
 % -----------------------------------------------------------------------------%
@@ -262,7 +266,9 @@ This is an example of section with citations by \citet{McAfee1992-sn} \citep[see
   \end{subfigure}
   \begin{tablenotes}
     \footnotesize
-    \item \textbf{Notes:} This two figures represent the moving average of the broad money and inflation between 2010Q1--2021Q2. Panel A reports the broad money and Panel B reports inflation rate growth. The $y$-axis reports the percentage change with multiply by 100 bias, the $x$-axis is the time period in quarters. The data uses to plot these figure come the National Bank of Cambodia and the National Institute of Statistics.
+    % Here for the captions of tables and figures it would take the \item before, but it gives indentation
+    % so we do not really want that 
+    \textbf{Notes:} This two figures represent the moving average of the broad money and inflation between 2010Q1--2021Q2. Panel A reports the broad money and Panel B reports inflation rate growth. The $y$-axis reports the percentage change with multiply by 100 bias, the $x$-axis is the time period in quarters. The data uses to plot these figure come the National Bank of Cambodia and the National Institute of Statistics.
   \end{tablenotes}
 
 \end{figure}
