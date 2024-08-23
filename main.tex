@@ -10,6 +10,16 @@
 % Babel dictionaries, include the languages we use in the paper
 \usepackage[main=british]{babel}
 
+% activate to hide todonotes in the document
+%\setuptodonotes{disable}
+
+% use endfloat package for tables' and figures' placeholders, that puts all
+% figures and tables at te end of the document.
+\usepackage[nolists,heads]{endfloat}
+% little hack to make `endfloat` text in caps
+\renewcommand\figureplace{\MakeUppercase{\floatplace{figure}}}
+\renewcommand\tableplace{\MakeUppercase{\floatplace{table}}}
+
 % -----------------------------------------------------------------------------%
 %   Relative pathnames for figures and tables                                  %
 % -----------------------------------------------------------------------------%
