@@ -22,6 +22,7 @@
 \usepackage{mathpazo} % maths fonts to match Palatino
 \usepackage{setspace} % spacing
 \usepackage{relsize} % relative dimensions to font
+\usepackage{ragged2e} % better text alignment
 
 % figures and tables objects
 \usepackage{graphicx}
@@ -599,5 +600,15 @@
 % Distributions
 % Normal
 \newcommand{\normal}[2]{\cN\parens{#1, #2}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Tablenotes paragraph alignment
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Redefining the tablenotes settings to have footnote size and the better
+% justified text using ragged2e package to avoid stretching of short notes.
+\makeatletter
+\renewcommand{\TPTnoteSettings}{\footnotesize\justifying}
+\makeatother
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
