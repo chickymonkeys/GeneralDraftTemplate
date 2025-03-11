@@ -33,7 +33,9 @@
 \usepackage{booktabs} % pretty formatted tables \midrule etc.
 \usepackage[para]{threeparttable} % for \tablenotes as additional captions
 % Remember to set .latexmkrc to $pdflatex='pdflatex -shell-escape'
-% And to add Inkscape or similar to the PATH
+% and to add Inkscape or similar to the PATH
+% To include SVGs without rendering fonts with pdflatex you can use the option
+% includesvg[inkscapelatex=false,width=\textwidth]{path/to/file.svg}
 \usepackage{svg}
 
 % lists
