@@ -39,7 +39,7 @@
 \usepackage{datatool}
 \DTLsetseparator{;} % Set the separator between the columns.
 % Loads mydata.dat with column headers 'thekey' and 'thevalue'
-\DTLloaddb[noheader, keys={thekey;thevalue}]{scalars}{export_scalars.dat}
+\DTLloaddb[noheader, keys={thekey,thevalue}]{scalars}{export_scalars.dat}
 % Command to include the number in the text
 \newcommand{\scalarinput}[1]{\DTLfetch{scalars}{thekey}{#1}{thevalue}}
 
@@ -52,22 +52,32 @@
 % referencing external documents in overleaf, otherwise the xr package breaks.
 % https://tex.stackexchange.com/questions/107864/ifusername-foo-else-fi
 
+% -----------------------------------------------------------------------------%
+%   References path handler between overleaf projects and local                %
+% -----------------------------------------------------------------------------%
+% Small snippet of code that allows to assign the correct pathname for the
+% references directory when using my local system instead of Overleaf when
+% when working with others. We also insert a quick hack for cross-referencing
+% external documents in overleaf, otherwise the xr package breaks.
+% https://tex.stackexchange.com/questions/107864/ifusername-foo-else-fi
+
+\usepackage{ifplatform}
 \usepackage{catchfile}
 
-% #1 = control sequence to define
-% #2 = variable to get the value of
-\newcommand{\getvar}[2]{%
-    \CatchFileEdef#1{"|kpsewhich -var-value #2"}{\endlinechar=-1 }%
-}
+% Identify the username of the local system
+\ifwindows
+    \CatchFileEdef{\usrtest}{"|PowerShell.exe echo $Env:UserName"}{\endlinechar=-1 }%
+\else
+    \CatchFileEdef{\usrtest}{"|kpsewhich -var-value USER"}{\endlinechar=-1 }%
+\fi
 
 % specify your username locally
-\def\me{dubidub}
-\getvar{\usrtest}{USER}
+\def\me{alepi}
 
 \ifx\me\usrtest
-    \newcommand*{\RefsPath}{../references}
+    \newcommand*{\RefsPath}{./references}
 \else
-    \newcommand*{\RefsPath}{docs/references}
+    \newcommand*{\RefsPath}{references}
     \makeatletter
     \newcommand*{\addFileDependency}[1]{% argument=file name and extension
       \typeout{(#1)}
@@ -109,7 +119,7 @@
 %\date{}
 
 % main title 
-\title{Insert a Nice Title here with Title Case\thanks{Acknowledgements with \lipsum[2]. Use footnote for providing further information about author (webpage, alternative address) \emph{and} funding agencies.}}
+\title{Insert a Nice Title here with Title Case\thanks{Acknowledgements. Use footnote for providing further information about author (webpage, alternative address) \emph{and} funding agencies.}}
 % optional subtitle, leave empty if you dont want it
 \renewcommand{\subtitle}{Online Appendix}
 
@@ -190,19 +200,20 @@
 
 \tableofcontents	
 
-%-------------------------------------------------------------------	  
+%-------------------------------------------------------------------
 \section{Data Appendix}\label{app:b}
-%-------------------------------------------------------------------	
-In this section, I deliver additional tables of summary statistics for macro data and microdata used as monetary policy shocks, macroeconomic and financial aggregates, and household wealth through three monetary policy channels. First, I present macro data, and then I give detailed statistics on the level of households. Finally, I show the histogram of the distribution of household wealth across the country and the region. 
+%-------------------------------------------------------------------
+
+In this section, I deliver additional tables of summary statistics for macro data and microdata used as monetary policy shocks, macroeconomic and financial aggregates, and household wealth through three monetary policy channels. First, I present macro data, and then I give detailed statistics on the level of households. Finally, I show the histogram of the distribution of household wealth across the country and the region \citep{GIZ2015}.
 
 %----------------------------------------------------------------------------- %
 %   REFERENCES                                                                 %
 %----------------------------------------------------------------------------- %
 
 \clearpage\newpage
-\bibliographystyle{aea}
+\bibliographystyle{\RefsPath/aea}
 %\bibliography{\RefsPath/references,\RefsPath/otherreferences}
-\bibliography{references}
+\bibliography{\RefsPath/references}
 % \printbibliography
 \clearpage
 

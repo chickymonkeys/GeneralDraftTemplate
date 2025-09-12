@@ -42,10 +42,10 @@
 % document after the endfloats, otherwise \stickappendixfalse
 
 \newif\ifstickappendix
-\stickappendixfalse
+\stickappendixtrue
 
 % insert appendix file name
-\newcommand{\AppendixName}{appendix.tex}
+\newcommand{\AppendixName}{appendix}
 
 \usepackage{xr}
 \ifx\me\usrtest
@@ -73,28 +73,29 @@
 % -----------------------------------------------------------------------------%
 %   References path handler between overleaf projects and local                %
 % -----------------------------------------------------------------------------%
-% small snippet of code from stack overflow that allows me to assign the correct
-% pathname for the references directory when using my local system instead of
-% Overleaf when working with others. We also insert a quick hack for cross-
-% referencing external documents in overleaf, otherwise the xr package breaks.
+% Small snippet of code that allows to assign the correct pathname for the
+% references directory when using my local system instead of Overleaf when
+% when working with others. We also insert a quick hack for cross-referencing
+% external documents in overleaf, otherwise the xr package breaks.
 % https://tex.stackexchange.com/questions/107864/ifusername-foo-else-fi
 
+\usepackage{ifplatform}
 \usepackage{catchfile}
 
-% #1 = control sequence to define
-% #2 = variable to get the value of
-\newcommand{\getvar}[2]{%
-    \CatchFileEdef#1{"|kpsewhich -var-value #2"}{\endlinechar=-1 }%
-}
+% Identify the username of the local system
+\ifwindows
+    \CatchFileEdef{\usrtest}{"|PowerShell.exe echo $Env:UserName"}{\endlinechar=-1 }
+\else
+    \CatchFileEdef{\usrtest}{"|kpsewhich -var-value USER"}{\endlinechar=-1 }
+\fi
 
 % specify your username locally
-\def\me{dubidub}
-\getvar{\usrtest}{USER}
+\def\me{alepi}
 
 \ifx\me\usrtest
-    \newcommand*{\RefsPath}{../references}
+    \newcommand*{\RefsPath}{./references} % relative path locally
 \else
-    \newcommand*{\RefsPath}{docs/references}
+    \newcommand*{\RefsPath}{references} % path in overleaf
     \makeatletter
     \newcommand*{\addFileDependency}[1]{% argument=file name and extension
       \typeout{(#1)}
@@ -282,9 +283,9 @@ Table \ref{tab:gvar} summarizes the Granger-causality results for the six-variab
 %----------------------------------------------------------------------------- %
 
 \clearpage\newpage
-\bibliographystyle{aea}
+\bibliographystyle{\RefsPath/aea}
 %\bibliography{\RefsPath/references,\RefsPath/otherreferences}
-\bibliography{references}
+\bibliography{\RefsPath/references}
 % \printbibliography
 \clearpage
 
