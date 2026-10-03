@@ -1,3 +1,4 @@
+% !TeX program = pdflatex
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Document-Specific Settings
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -10,15 +11,12 @@
 % Babel dictionaries, include the languages we use in the paper
 \usepackage[main=british]{babel}
 
-% activate to hide todonotes in the document
-%\setuptodonotes{disable}
-
-% use endfloat package for tables' and figures' placeholders, that puts all
-% figures and tables at te end of the document. Comment if you do not want it.
-\usepackage[nolists,heads]{endfloat}
-% little hack to make `endfloat` text in caps
-\renewcommand\figureplace{\MakeUppercase{\floatplace{figure}}}
-\renewcommand\tableplace{\MakeUppercase{\floatplace{table}}}
+% Endfloat is optional and disabled by default.
+\ifGDTEndfloat
+  \usepackage[nolists,heads]{endfloat}
+  \renewcommand\figureplace{\MakeUppercase{\floatplace{figure}}}
+  \renewcommand\tableplace{\MakeUppercase{\floatplace{table}}}
+\fi
 
 % -----------------------------------------------------------------------------%
 %   Relative pathnames for figures and tables                                  %
@@ -35,81 +33,29 @@
 \DeclareGraphicsExtensions{.svg, .pdf, .png}
 
 %----------------------------------------------------------------------------- %
-%   External Appendix                                                          %
+%   Companion Cross-References                                                  %
 %----------------------------------------------------------------------------- %
-% flag to attach the appendix at the end of the document
-% set \stickappendixtrue if you want the appendix stick at the end of the
-% document after the endfloats, otherwise \stickappendixfalse
-
-\newif\ifstickappendix
-\stickappendixtrue
-
-% insert appendix file name
-\newcommand{\AppendixName}{appendix}
-
-\usepackage{xr}
-\ifx\me\usrtest
-    \externaldocument{\AppendixName}
-\else
-    \overleafextdocument{\AppendixName}
-\fi
-\usepackage[toc,page]{appendix}
+\usepackage{gdt-build}
+\GDTExternalDocument{appendix.tex}{appendix}
 
 % ------------------------------------------------------------------------------
 %   Data loader from .dat files
 % ------------------------------------------------------------------------------
 % Trick to import numbers from replication into the document and captions.
 \usepackage{datatool}
-\DTLsetseparator{;} % Set the separator between the columns.
-% Loads mydata.dat with column headers 'thekey' and 'thevalue'. It can load
-% multiple 'database', but they need to have different name. Here the name
-% assigned to this dataset is scalars.
-\DTLloaddb[noheader, keys={thekey,thevalue}]{scalars}{export_scalars.dat}
-% Command to include the number in the text. There should be a command like
-% this for each dataset imported, such that they do not overlap and they can
-% be used in the text easily, specifying the anchor name of the 'database'.
-\newcommand{\scalarinput}[1]{\DTLfetch{scalars}{thekey}{#1}{thevalue}}
+\DTLsetseparator{;}
+\IfFileExists{export_scalars.dat}{%
+  \DTLloaddb[noheader, keys={thekey,thevalue}]{scalars}{export_scalars.dat}%
+  \newcommand{\scalarinput}[1]{\DTLfetch{scalars}{thekey}{##1}{thevalue}}%
+}{%
+  \newcommand{\scalarinput}[1]{\texttt{##1}}%
+}
 
 % -----------------------------------------------------------------------------%
-%   References path handler between overleaf projects and local                %
+%   Relative references path                                                   %
 % -----------------------------------------------------------------------------%
-% Small snippet of code that allows to assign the correct pathname for the
-% references directory when using my local system instead of Overleaf when
-% when working with others. We also insert a quick hack for cross-referencing
-% external documents in overleaf, otherwise the xr package breaks.
-% https://tex.stackexchange.com/questions/107864/ifusername-foo-else-fi
-
-\usepackage{ifplatform}
-\usepackage{catchfile}
-
-% Identify the username of the local system
-\ifwindows
-    \CatchFileEdef{\usrtest}{"|PowerShell.exe echo $Env:UserName"}{\endlinechar=-1 }
-\else
-    \CatchFileEdef{\usrtest}{"|kpsewhich -var-value USER"}{\endlinechar=-1 }
-\fi
-
-% specify your username locally
-\def\me{alepi}
-
-\ifx\me\usrtest
-    \newcommand*{\RefsPath}{./references} % relative path locally
-\else
-    \newcommand*{\RefsPath}{references} % path in overleaf
-    \makeatletter
-    \newcommand*{\addFileDependency}[1]{% argument=file name and extension
-      \typeout{(#1)}
-      \@addtofilelist{#1}
-      \IfFileExists{#1}{}{\typeout{No file #1.}}
-    }
-    \makeatother
-    
-    \newcommand*{\overleafextdocument}[1]{%
-        \externaldocument{#1}%
-        \addFileDependency{#1.tex}%
-        \addFileDependency{#1.aux}%
-    }
-\fi
+\newcommand*{\RefsPath}{references}
+\addbibresource{\RefsPath/references.bib}
 
 %----------------------------------------------------------------------------- %
 %   Working Paper Metadata                                                     %
@@ -121,17 +67,12 @@
 \usepackage[useregional]{datetime2}
 % if I want to insert a specific date
 \newcommand{\thedate}{\DTMdisplaydate{2017}{02}{21}{-1}}
-\newcommand{\monthyeardate}{%
-  \DTMenglishmonthname{\@dtm@month} \@dtm@year
-}
 
 % Here you can change the date presented in the paper title
 % If I want a specific date I put in the date
 % \date{This Version: \thedate}
 % or if I want the date of today I just insert
 \date{This Version: \today}
-% or if I want just month and year
-% \date{This Version: \monthyeardate}
 % or I just remove it
 %\date{}
 
@@ -223,7 +164,6 @@ Acknowledgements with \blindtext. Use footnote for providing further information
 %----------------------------------------------------------------------------- %
 
 % \tableofcontents
-% \listoftodos
 
 % \clearpage
 % \newpage
@@ -243,8 +183,6 @@ Here I am testing the scalar input command: \textbf{the first beta is \scalarinp
 \input{\TablesPath table_3.tex}
 
 \blindtext[2] \\
-
-\improvement[inline]{Todo.}
 
 \section{Section 2}
 
@@ -283,16 +221,11 @@ Table \ref{tab:gvar} summarizes the Granger-causality results for the six-variab
 %----------------------------------------------------------------------------- %
 
 \clearpage\newpage
-\bibliographystyle{\RefsPath/aea}
-%\bibliography{\RefsPath/references,\RefsPath/otherreferences}
-\bibliography{\RefsPath/references}
-% \printbibliography
+\printbibliography
 \clearpage
 
-% include appendix if wanted
-\ifstickappendix
+\ifGDTEndfloat
   \processdelayedfloats
-  \includepdf[pages=-]{\AppendixName}
 \fi
 
 %----------------------------------------------------------------------------- %

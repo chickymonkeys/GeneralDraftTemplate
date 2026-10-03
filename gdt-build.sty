@@ -1,0 +1,22 @@
+% Portable cross-document labels and bibliography paths for root proxies.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{gdt-build}[2026/10/02 Cross-document references]
+\RequirePackage{xr}
+
+% The imported draft keeps its existing ../references path. Biber resolves
+% resource paths relative to the root target instead, hence the prefix.
+\ifdefined\GDTBibliographyBase
+  \let\GDTOriginalAddBibResource\addbibresource
+  \renewcommand{\addbibresource}[2][]{%
+    \GDTOriginalAddBibResource[#1]{\GDTBibliographyBase#2}%
+  }
+\fi
+
+% Open the other source to register it as a latexmk dependency even when its
+% auxiliary file already exists. Its generated labels use root target names.
+\newread\GDTExternalSource
+\newcommand{\GDTExternalDocument}[2]{%
+  \openin\GDTExternalSource=#1\relax
+  \closein\GDTExternalSource
+  \externaldocument[][nocite]{#2}%
+}

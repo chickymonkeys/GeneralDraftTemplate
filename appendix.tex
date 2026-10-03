@@ -1,3 +1,4 @@
+% !TeX program = pdflatex
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Document-Specific Settings
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -21,77 +22,13 @@
 \DeclareGraphicsExtensions{.pdf, .png}
 
 %----------------------------------------------------------------------------- %
-%   External Appendix                                                          %
+%   Companion Cross-References                                                  %
 %----------------------------------------------------------------------------- %
 
-\usepackage{xr}
-\ifx\me\usrtest
-    \externaldocument{main}
-\else
-    \overleafextdocument{main}
-\fi
-\usepackage[toc,page]{appendix}
-
-% ------------------------------------------------------------------------------
-%   Data loader from .dat files
-% ------------------------------------------------------------------------------
-% Trick to import numbers from replication into the document and captions.
-\usepackage{datatool}
-\DTLsetseparator{;} % Set the separator between the columns.
-% Loads mydata.dat with column headers 'thekey' and 'thevalue'
-\DTLloaddb[noheader, keys={thekey,thevalue}]{scalars}{export_scalars.dat}
-% Command to include the number in the text
-\newcommand{\scalarinput}[1]{\DTLfetch{scalars}{thekey}{#1}{thevalue}}
-
-% -----------------------------------------------------------------------------%
-%   References path handler between overleaf projects and local                %
-% -----------------------------------------------------------------------------%
-% small snippet of code from stack overflow that allows me to assign the correct
-% pathname for the references directory when using my local system instead of
-% Overleaf when working with others. We also insert a quick hack for cross-
-% referencing external documents in overleaf, otherwise the xr package breaks.
-% https://tex.stackexchange.com/questions/107864/ifusername-foo-else-fi
-
-% -----------------------------------------------------------------------------%
-%   References path handler between overleaf projects and local                %
-% -----------------------------------------------------------------------------%
-% Small snippet of code that allows to assign the correct pathname for the
-% references directory when using my local system instead of Overleaf when
-% when working with others. We also insert a quick hack for cross-referencing
-% external documents in overleaf, otherwise the xr package breaks.
-% https://tex.stackexchange.com/questions/107864/ifusername-foo-else-fi
-
-\usepackage{ifplatform}
-\usepackage{catchfile}
-
-% Identify the username of the local system
-\ifwindows
-    \CatchFileEdef{\usrtest}{"|PowerShell.exe echo $Env:UserName"}{\endlinechar=-1 }%
-\else
-    \CatchFileEdef{\usrtest}{"|kpsewhich -var-value USER"}{\endlinechar=-1 }%
-\fi
-
-% specify your username locally
-\def\me{alepi}
-
-\ifx\me\usrtest
-    \newcommand*{\RefsPath}{./references}
-\else
-    \newcommand*{\RefsPath}{references}
-    \makeatletter
-    \newcommand*{\addFileDependency}[1]{% argument=file name and extension
-      \typeout{(#1)}
-      \@addtofilelist{#1}
-      \IfFileExists{#1}{}{\typeout{No file #1.}}
-    }
-    \makeatother
-    
-    \newcommand*{\overleafextdocument}[1]{%
-        \externaldocument{#1}%
-        \addFileDependency{#1.tex}%
-        \addFileDependency{#1.aux}%
-    }
-\fi
+\usepackage{gdt-build}
+\GDTExternalDocument{main.tex}{main}
+\newcommand*{\RefsPath}{references}
+\addbibresource{\RefsPath/references.bib}
 
 %----------------------------------------------------------------------------- %
 %   Working Paper Metadata                                                     %
@@ -104,17 +41,12 @@
 \usepackage[useregional]{datetime2}
 % if I want to insert a specific date
 \newcommand{\thedate}{\DTMdisplaydate{2017}{02}{21}{-1}}
-\newcommand{\monthyeardate}{%
-  \DTMenglishmonthname{\@dtm@month} \@dtm@year
-}
 
 % Here you can change the date presented in the paper title
 % If I want a specific date I put in the date
 % \date{This Version: \thedate}
 % or if I want the date of today I just insert
 \date{This Version: \today}
-% or if I want just month and year
-% \date{This Version: \monthyeardate}
 % or I just remove it
 %\date{}
 
@@ -178,9 +110,6 @@
 %  TABLE OF CONTENTS                                                           %
 %----------------------------------------------------------------------------- %
 
-\tableofcontents
-\listoftodos
-
 \clearpage
 \newpage
 
@@ -198,7 +127,7 @@
 
 \vspace{-3em}
 
-\tableofcontents	
+\tableofcontents
 
 %-------------------------------------------------------------------
 \section{Data Appendix}\label{app:b}
@@ -211,10 +140,7 @@ In this section, I deliver additional tables of summary statistics for macro dat
 %----------------------------------------------------------------------------- %
 
 \clearpage\newpage
-\bibliographystyle{\RefsPath/aea}
-%\bibliography{\RefsPath/references,\RefsPath/otherreferences}
-\bibliography{\RefsPath/references}
-% \printbibliography
+\printbibliography
 \clearpage
 
 %----------------------------------------------------------------------------- %

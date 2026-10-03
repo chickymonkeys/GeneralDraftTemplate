@@ -24,16 +24,18 @@
 \usepackage{relsize} % relative dimensions to font
 \usepackage{ragged2e} % better text alignment
 \usepackage[hang,flushmargin]{footmisc} % controlling margin of footnotes
+\usepackage{placeins} % keep floats within their sections
+\usepackage{adjustbox} % adjust content to fit available space
 
 % figures and tables objects
 \usepackage{graphicx}
 \usepackage{caption,subcaption} % captions
+\renewcommand{\thesubfigure}{\Alph{subfigure}}
 \usepackage{multicol} % multicolumn lists
 \usepackage{multirow} % multiple rows
 \usepackage{booktabs} % pretty formatted tables \midrule etc.
 \usepackage[para]{threeparttable} % for \tablenotes as additional captions
-% Remember to set .latexmkrc to $pdflatex='pdflatex -shell-escape'
-% and to add Inkscape or similar to the PATH
+% SVG conversion needs shell escape (configured in latexmkrc) and Inkscape.
 % To include SVGs without rendering fonts with pdflatex you can use the option
 % includesvg[inkscapelatex=false,width=\textwidth]{path/to/file.svg}
 \usepackage{svg}
@@ -56,6 +58,7 @@
 \usepackage{pdflscape, blindtext} % landscape pages and blindtext
 \usepackage{makecell} % for multiline headers
 \usepackage{afterpage} % float text for landscape pages
+\usepackage[hyphens]{url} % allow line breaks at URL hyphens
 \usepackage{comment} % \begin{comment} environment for multi blocks
 \usepackage{soul} % highlight text to modify with \hl{}
 \usepackage{pdfpages} % PDFs
@@ -149,10 +152,8 @@
     colorlinks = true,
 }
 
-% we are using bibtex with natbib instead of biblatex and biber as in the
-% original format because of issues with biber and to use the AEA bibliography
-% \usepackage[semicolon,authoryear]{natbib}
-\usepackage{natbib}
+% Bibliography interface supplied by the manuscript build configuration.
+\RequirePackage{aea-bibliography}
 
 % -----------------------------------------------------------------------------
 % Math-Specific Packages and TikZ
@@ -176,22 +177,6 @@
 %\usepgfplotslibrary{dateplot}
 
 % -----------------------------------------------------------------------------
-% TODOs Lists (create reference for the commands)
-% -----------------------------------------------------------------------------
-
-% Use more than one optional parameter in a new commands
-\usepackage{xargs}
-% Todo
-\usepackage[colorinlistoftodos,prependcaption,textsize=normalsize]{todonotes}
-\newcommandx{\unsure}[2][1=]{%
-    \todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
-\newcommandx{\change}[2][1=]{
-    \todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}%
-\newcommandx{\info}[2][1=]{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}}
-\newcommandx{\improvement}[2][1=]{%
-    \todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}}
-\newcommandx{\thiswillnotshow}[2][1=]{\todo[disable,#1]{#2}}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Document Settings
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -205,6 +190,13 @@
 %\linespread{1.5}
 
 \usepackage{alltt} % to prevent memory overflow in case of long periods
+\usepackage{titlesec} % section heading formatting
+\titleformat{\subsubsection}[runin]
+  {\normalfont\normalsize\bfseries}{\thesubsubsection}{2mm}{}
+
+% Endfloat is opt-in. Set \GDTEndfloattrue in the document preamble to enable it.
+\newif\ifGDTEndfloat
+\GDTEndfloatfalse
 
 % Geometry
 \geometry{letterpaper, margin=2.54cm}

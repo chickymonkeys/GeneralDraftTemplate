@@ -1,0 +1,76 @@
+% Project-owned AEA-oriented bibliography configuration.
+% This is not an official AEA style file. It uses biblatex's maintained
+% author-year style and limits customizations to behaviors in the project's
+% legacy aea.bst and the current AER Style Guide.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{aea-bibliography}[2026/10/02 AEA-oriented biblatex configuration]
+
+% Load biblatex here; do not load natbib separately. The natbib option provides
+% compatibility commands such as \citep, \citet, and starred \citealt*.
+\RequirePackage[
+  backend=biber,
+  style=authoryear,
+  natbib=true,
+  sorting=nyt,
+  maxcitenames=4,
+  mincitenames=1,
+  maxbibnames=10,
+  minbibnames=7,
+  uniquelist=false,
+  giveninits=false,
+  doi=false,
+  url=false,
+  eprint=false
+]{biblatex}
+% The paper uses British prose but the AEA bibliography quotes titles with
+% double quotation marks. Relax only bibliography line breaks for long entries.
+\DeclareLanguageMapping{british}{american}
+\AtBeginBibliography{\sloppy}
+% The standard style explicitly enables URLs for @online entries, so disable
+% that type-specific default as well as the global URL and DOI output.
+\ExecuteBibliographyOptions[online]{url=false,doi=false}
+
+% The legacy aea.bst bolds names and years in bibliography labels.
+\DeclareNameWrapperFormat{sortname}{\mkbibbold{#1}}
+\renewbibmacro*{date+extradate}{%
+  \iffieldundef{labelyear}
+    {}
+    {\mkbibbold{\printlabeldateextra}\addperiod}}
+
+% biblatex's author-year bibliography normally puts the year in parentheses.
+% The legacy AEA bibliography uses "Author. Year." instead.
+\DeclareDelimFormat[bib]{nameyeardelim}{\addperiod\space}
+
+% Match aea.bst's quoted article/chapter/report titles and italic book titles.
+\DeclareFieldFormat[article,inbook,incollection,inproceedings,unpublished,report,thesis,techreport]{title}{\mkbibquote{#1\isdot}}
+\DeclareFieldFormat[book,collection,proceedings,manual]{title}{\mkbibemph{#1\isdot}}
+\DeclareFieldFormat[article]{pages}{#1}
+
+% AEA article order and punctuation: journal, volume(issue): pages. Keeping
+% this in the article driver avoids changing punctuation for other entry types.
+\DeclareBibliographyDriver{article}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author/translator+others}%
+  \setunit{\printdelim{nametitledelim}}\newblock
+  \usebibmacro{title}%
+  \newunit\newblock
+  \usebibmacro{journal}%
+  \setunit{\addcomma\space}%
+  \printfield{volume}%
+  \iffieldundef{number}{}{\printtext[parens]{\printfield{number}}}%
+  \setunit{\addcolon\space}%
+  \printfield{pages}%
+  \newunit\newblock
+  \printfield{note}%
+  \newunit\newblock
+  \usebibmacro{doi+eprint+url}%
+  \newunit\newblock
+  \usebibmacro{addendum+pubstate}%
+  \setunit{\bibpagerefpunct}\newblock
+  \usebibmacro{pageref}%
+  \newunit\newblock
+  \iftoggle{bbx:related}
+    {\usebibmacro{related:init}\usebibmacro{related}}
+    {}%
+  \usebibmacro{finentry}}

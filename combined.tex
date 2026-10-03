@@ -1,0 +1,14 @@
+% !TeX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage{pdfpages}
+\newread\GDTCombinedSource
+
+\begin{document}
+% Track source edits even when the included PDFs were last built earlier.
+\openin\GDTCombinedSource=main.tex\relax
+\closein\GDTCombinedSource
+\openin\GDTCombinedSource=appendix.tex\relax
+\closein\GDTCombinedSource
+\includepdf[pages=-]{main.pdf}
+\includepdf[pages=-]{appendix.pdf}
+\end{document}
