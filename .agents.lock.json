@@ -1,0 +1,756 @@
+{
+  "version": 1,
+  "system": {
+    "repo": "chickymonkeys/agents-playground",
+    "ref": "main",
+    "sha": "e56f637fbd5e7883a9da9ba73bc0b61fcfec0a59"
+  },
+  "installed_at": "2026-10-04T15:22:54Z",
+  "components": [
+    {
+      "name": "ask-matt",
+      "kind": "skill",
+      "path": ".agents/skills/ask-matt"
+    },
+    {
+      "name": "code-review",
+      "kind": "skill",
+      "path": ".agents/skills/code-review"
+    },
+    {
+      "name": "codebase-design",
+      "kind": "skill",
+      "path": ".agents/skills/codebase-design"
+    },
+    {
+      "name": "data-discovery",
+      "kind": "skill",
+      "path": ".agents/skills/data-discovery"
+    },
+    {
+      "name": "deck",
+      "kind": "skill",
+      "path": ".agents/skills/deck"
+    },
+    {
+      "name": "deployed-system",
+      "kind": "skill",
+      "path": ".agents/skills/deployed-system"
+    },
+    {
+      "name": "diagnosing-bugs",
+      "kind": "skill",
+      "path": ".agents/skills/diagnosing-bugs"
+    },
+    {
+      "name": "domain-modeling",
+      "kind": "skill",
+      "path": ".agents/skills/domain-modeling"
+    },
+    {
+      "name": "econ-write",
+      "kind": "skill",
+      "path": ".agents/skills/econ-write"
+    },
+    {
+      "name": "grill-me",
+      "kind": "skill",
+      "path": ".agents/skills/grill-me"
+    },
+    {
+      "name": "grill-with-docs",
+      "kind": "skill",
+      "path": ".agents/skills/grill-with-docs"
+    },
+    {
+      "name": "grilling",
+      "kind": "skill",
+      "path": ".agents/skills/grilling"
+    },
+    {
+      "name": "handoff",
+      "kind": "skill",
+      "path": ".agents/skills/handoff"
+    },
+    {
+      "name": "humanize",
+      "kind": "skill",
+      "path": ".agents/skills/humanize"
+    },
+    {
+      "name": "implement",
+      "kind": "skill",
+      "path": ".agents/skills/implement"
+    },
+    {
+      "name": "improve-codebase-architecture",
+      "kind": "skill",
+      "path": ".agents/skills/improve-codebase-architecture"
+    },
+    {
+      "name": "papers-finder",
+      "kind": "skill",
+      "path": ".agents/skills/papers-finder"
+    },
+    {
+      "name": "pdf-artifact-extractor",
+      "kind": "skill",
+      "path": ".agents/skills/pdf-artifact-extractor"
+    },
+    {
+      "name": "proofread",
+      "kind": "skill",
+      "path": ".agents/skills/proofread"
+    },
+    {
+      "name": "prototype",
+      "kind": "skill",
+      "path": ".agents/skills/prototype"
+    },
+    {
+      "name": "research",
+      "kind": "skill",
+      "path": ".agents/skills/research"
+    },
+    {
+      "name": "research-standards",
+      "kind": "skill",
+      "path": ".agents/skills/research-standards"
+    },
+    {
+      "name": "resolving-merge-conflicts",
+      "kind": "skill",
+      "path": ".agents/skills/resolving-merge-conflicts"
+    },
+    {
+      "name": "scholar-causal",
+      "kind": "skill",
+      "path": ".agents/skills/scholar-causal"
+    },
+    {
+      "name": "scholar-citation",
+      "kind": "skill",
+      "path": ".agents/skills/scholar-citation"
+    },
+    {
+      "name": "scholar-code-review",
+      "kind": "skill",
+      "path": ".agents/skills/scholar-code-review"
+    },
+    {
+      "name": "scholar-replication",
+      "kind": "skill",
+      "path": ".agents/skills/scholar-replication"
+    },
+    {
+      "name": "scholar-replication-archives",
+      "kind": "skill",
+      "path": ".agents/skills/scholar-replication-archives"
+    },
+    {
+      "name": "scholar-respond",
+      "kind": "skill",
+      "path": ".agents/skills/scholar-respond"
+    },
+    {
+      "name": "scholar-verify",
+      "kind": "skill",
+      "path": ".agents/skills/scholar-verify"
+    },
+    {
+      "name": "setup-matt-pocock-skills",
+      "kind": "skill",
+      "path": ".agents/skills/setup-matt-pocock-skills"
+    },
+    {
+      "name": "slide-spec",
+      "kind": "skill",
+      "path": ".agents/skills/slide-spec"
+    },
+    {
+      "name": "tdd",
+      "kind": "skill",
+      "path": ".agents/skills/tdd"
+    },
+    {
+      "name": "teach",
+      "kind": "skill",
+      "path": ".agents/skills/teach"
+    },
+    {
+      "name": "technical-exploration",
+      "kind": "skill",
+      "path": ".agents/skills/technical-exploration"
+    },
+    {
+      "name": "to-questionnaire",
+      "kind": "skill",
+      "path": ".agents/skills/to-questionnaire"
+    },
+    {
+      "name": "to-spec",
+      "kind": "skill",
+      "path": ".agents/skills/to-spec"
+    },
+    {
+      "name": "to-tickets",
+      "kind": "skill",
+      "path": ".agents/skills/to-tickets"
+    },
+    {
+      "name": "tracker-prose",
+      "kind": "skill",
+      "path": ".agents/skills/tracker-prose"
+    },
+    {
+      "name": "triage",
+      "kind": "skill",
+      "path": ".agents/skills/triage"
+    },
+    {
+      "name": "voice-profile",
+      "kind": "skill",
+      "path": ".agents/skills/voice-profile"
+    },
+    {
+      "name": "wait-what",
+      "kind": "skill",
+      "path": ".agents/skills/wait-what"
+    },
+    {
+      "name": "wayfinder",
+      "kind": "skill",
+      "path": ".agents/skills/wayfinder"
+    },
+    {
+      "name": "wizard",
+      "kind": "skill",
+      "path": ".agents/skills/wizard"
+    },
+    {
+      "name": "writing-for-agents",
+      "kind": "skill",
+      "path": ".agents/skills/writing-for-agents"
+    },
+    {
+      "name": "deck-reader",
+      "kind": "agent",
+      "path": ".agents/agents/claude/deck-reader.md"
+    },
+    {
+      "name": "humanize-auditor",
+      "kind": "agent",
+      "path": ".agents/agents/claude/humanize-auditor.md"
+    },
+    {
+      "name": "peer-reviewer-computational",
+      "kind": "agent",
+      "path": ".agents/agents/claude/peer-reviewer-computational.md"
+    },
+    {
+      "name": "peer-reviewer-quant",
+      "kind": "agent",
+      "path": ".agents/agents/claude/peer-reviewer-quant.md"
+    },
+    {
+      "name": "peer-reviewer-senior",
+      "kind": "agent",
+      "path": ".agents/agents/claude/peer-reviewer-senior.md"
+    },
+    {
+      "name": "peer-reviewer-theory",
+      "kind": "agent",
+      "path": ".agents/agents/claude/peer-reviewer-theory.md"
+    },
+    {
+      "name": "proofreader",
+      "kind": "agent",
+      "path": ".agents/agents/claude/proofreader.md"
+    },
+    {
+      "name": "review-code-correctness",
+      "kind": "agent",
+      "path": ".agents/agents/claude/review-code-correctness.md"
+    },
+    {
+      "name": "review-code-data-handling",
+      "kind": "agent",
+      "path": ".agents/agents/claude/review-code-data-handling.md"
+    },
+    {
+      "name": "review-code-reproducibility",
+      "kind": "agent",
+      "path": ".agents/agents/claude/review-code-reproducibility.md"
+    },
+    {
+      "name": "review-code-robustness",
+      "kind": "agent",
+      "path": ".agents/agents/claude/review-code-robustness.md"
+    },
+    {
+      "name": "review-code-statistics",
+      "kind": "agent",
+      "path": ".agents/agents/claude/review-code-statistics.md"
+    },
+    {
+      "name": "review-code-style",
+      "kind": "agent",
+      "path": ".agents/agents/claude/review-code-style.md"
+    },
+    {
+      "name": "verify-completeness",
+      "kind": "agent",
+      "path": ".agents/agents/claude/verify-completeness.md"
+    },
+    {
+      "name": "verify-figures",
+      "kind": "agent",
+      "path": ".agents/agents/claude/verify-figures.md"
+    },
+    {
+      "name": "verify-logic",
+      "kind": "agent",
+      "path": ".agents/agents/claude/verify-logic.md"
+    },
+    {
+      "name": "verify-numerics",
+      "kind": "agent",
+      "path": ".agents/agents/claude/verify-numerics.md"
+    },
+    {
+      "name": "deck-reader",
+      "kind": "agent",
+      "path": ".agents/agents/codex/deck-reader.toml"
+    },
+    {
+      "name": "humanize-auditor",
+      "kind": "agent",
+      "path": ".agents/agents/codex/humanize-auditor.toml"
+    },
+    {
+      "name": "peer-reviewer-computational",
+      "kind": "agent",
+      "path": ".agents/agents/codex/peer-reviewer-computational.toml"
+    },
+    {
+      "name": "peer-reviewer-quant",
+      "kind": "agent",
+      "path": ".agents/agents/codex/peer-reviewer-quant.toml"
+    },
+    {
+      "name": "peer-reviewer-senior",
+      "kind": "agent",
+      "path": ".agents/agents/codex/peer-reviewer-senior.toml"
+    },
+    {
+      "name": "peer-reviewer-theory",
+      "kind": "agent",
+      "path": ".agents/agents/codex/peer-reviewer-theory.toml"
+    },
+    {
+      "name": "proofreader",
+      "kind": "agent",
+      "path": ".agents/agents/codex/proofreader.toml"
+    },
+    {
+      "name": "review-code-correctness",
+      "kind": "agent",
+      "path": ".agents/agents/codex/review-code-correctness.toml"
+    },
+    {
+      "name": "review-code-data-handling",
+      "kind": "agent",
+      "path": ".agents/agents/codex/review-code-data-handling.toml"
+    },
+    {
+      "name": "review-code-reproducibility",
+      "kind": "agent",
+      "path": ".agents/agents/codex/review-code-reproducibility.toml"
+    },
+    {
+      "name": "review-code-robustness",
+      "kind": "agent",
+      "path": ".agents/agents/codex/review-code-robustness.toml"
+    },
+    {
+      "name": "review-code-statistics",
+      "kind": "agent",
+      "path": ".agents/agents/codex/review-code-statistics.toml"
+    },
+    {
+      "name": "review-code-style",
+      "kind": "agent",
+      "path": ".agents/agents/codex/review-code-style.toml"
+    },
+    {
+      "name": "verify-completeness",
+      "kind": "agent",
+      "path": ".agents/agents/codex/verify-completeness.toml"
+    },
+    {
+      "name": "verify-figures",
+      "kind": "agent",
+      "path": ".agents/agents/codex/verify-figures.toml"
+    },
+    {
+      "name": "verify-logic",
+      "kind": "agent",
+      "path": ".agents/agents/codex/verify-logic.toml"
+    },
+    {
+      "name": "verify-numerics",
+      "kind": "agent",
+      "path": ".agents/agents/codex/verify-numerics.toml"
+    },
+    {
+      "name": "deck-reader",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/deck-reader.md"
+    },
+    {
+      "name": "humanize-auditor",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/humanize-auditor.md"
+    },
+    {
+      "name": "peer-reviewer-computational",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/peer-reviewer-computational.md"
+    },
+    {
+      "name": "peer-reviewer-quant",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/peer-reviewer-quant.md"
+    },
+    {
+      "name": "peer-reviewer-senior",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/peer-reviewer-senior.md"
+    },
+    {
+      "name": "peer-reviewer-theory",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/peer-reviewer-theory.md"
+    },
+    {
+      "name": "proofreader",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/proofreader.md"
+    },
+    {
+      "name": "review-code-correctness",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/review-code-correctness.md"
+    },
+    {
+      "name": "review-code-data-handling",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/review-code-data-handling.md"
+    },
+    {
+      "name": "review-code-reproducibility",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/review-code-reproducibility.md"
+    },
+    {
+      "name": "review-code-robustness",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/review-code-robustness.md"
+    },
+    {
+      "name": "review-code-statistics",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/review-code-statistics.md"
+    },
+    {
+      "name": "review-code-style",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/review-code-style.md"
+    },
+    {
+      "name": "verify-completeness",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/verify-completeness.md"
+    },
+    {
+      "name": "verify-figures",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/verify-figures.md"
+    },
+    {
+      "name": "verify-logic",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/verify-logic.md"
+    },
+    {
+      "name": "verify-numerics",
+      "kind": "agent",
+      "path": ".agents/agents/opencode/verify-numerics.md"
+    }
+  ],
+  "paths": [
+    ".agents/README.md",
+    ".agents/agents/claude/deck-reader.md",
+    ".agents/agents/claude/humanize-auditor.md",
+    ".agents/agents/claude/peer-reviewer-computational.md",
+    ".agents/agents/claude/peer-reviewer-quant.md",
+    ".agents/agents/claude/peer-reviewer-senior.md",
+    ".agents/agents/claude/peer-reviewer-theory.md",
+    ".agents/agents/claude/proofreader.md",
+    ".agents/agents/claude/review-code-correctness.md",
+    ".agents/agents/claude/review-code-data-handling.md",
+    ".agents/agents/claude/review-code-reproducibility.md",
+    ".agents/agents/claude/review-code-robustness.md",
+    ".agents/agents/claude/review-code-statistics.md",
+    ".agents/agents/claude/review-code-style.md",
+    ".agents/agents/claude/verify-completeness.md",
+    ".agents/agents/claude/verify-figures.md",
+    ".agents/agents/claude/verify-logic.md",
+    ".agents/agents/claude/verify-numerics.md",
+    ".agents/agents/codex/deck-reader.toml",
+    ".agents/agents/codex/humanize-auditor.toml",
+    ".agents/agents/codex/peer-reviewer-computational.toml",
+    ".agents/agents/codex/peer-reviewer-quant.toml",
+    ".agents/agents/codex/peer-reviewer-senior.toml",
+    ".agents/agents/codex/peer-reviewer-theory.toml",
+    ".agents/agents/codex/proofreader.toml",
+    ".agents/agents/codex/review-code-correctness.toml",
+    ".agents/agents/codex/review-code-data-handling.toml",
+    ".agents/agents/codex/review-code-reproducibility.toml",
+    ".agents/agents/codex/review-code-robustness.toml",
+    ".agents/agents/codex/review-code-statistics.toml",
+    ".agents/agents/codex/review-code-style.toml",
+    ".agents/agents/codex/verify-completeness.toml",
+    ".agents/agents/codex/verify-figures.toml",
+    ".agents/agents/codex/verify-logic.toml",
+    ".agents/agents/codex/verify-numerics.toml",
+    ".agents/agents/opencode/deck-reader.md",
+    ".agents/agents/opencode/humanize-auditor.md",
+    ".agents/agents/opencode/peer-reviewer-computational.md",
+    ".agents/agents/opencode/peer-reviewer-quant.md",
+    ".agents/agents/opencode/peer-reviewer-senior.md",
+    ".agents/agents/opencode/peer-reviewer-theory.md",
+    ".agents/agents/opencode/proofreader.md",
+    ".agents/agents/opencode/review-code-correctness.md",
+    ".agents/agents/opencode/review-code-data-handling.md",
+    ".agents/agents/opencode/review-code-reproducibility.md",
+    ".agents/agents/opencode/review-code-robustness.md",
+    ".agents/agents/opencode/review-code-statistics.md",
+    ".agents/agents/opencode/review-code-style.md",
+    ".agents/agents/opencode/verify-completeness.md",
+    ".agents/agents/opencode/verify-figures.md",
+    ".agents/agents/opencode/verify-logic.md",
+    ".agents/agents/opencode/verify-numerics.md",
+    ".agents/safety-status.example.json",
+    ".agents/skills/ask-matt/LICENSE",
+    ".agents/skills/ask-matt/PHASE-BOUNDARIES.md",
+    ".agents/skills/ask-matt/SKILL.md",
+    ".agents/skills/ask-matt/agents/openai.yaml",
+    ".agents/skills/code-review/LICENSE",
+    ".agents/skills/code-review/SKILL.md",
+    ".agents/skills/code-review/agents/openai.yaml",
+    ".agents/skills/codebase-design/DEEPENING.md",
+    ".agents/skills/codebase-design/DESIGN-IT-TWICE.md",
+    ".agents/skills/codebase-design/LICENSE",
+    ".agents/skills/codebase-design/SKILL.md",
+    ".agents/skills/codebase-design/agents/openai.yaml",
+    ".agents/skills/data-discovery/SKILL.md",
+    ".agents/skills/deck/SKILL.md",
+    ".agents/skills/deck/agents/openai.yaml",
+    ".agents/skills/deck/references/domain-patterns.md",
+    ".agents/skills/deck/references/narrative-arc.md",
+    ".agents/skills/deck/references/rhetoric-of-decks.md",
+    ".agents/skills/deck/scripts/compile_deck.py",
+    ".agents/skills/deck/scripts/deck_common.py",
+    ".agents/skills/deck/scripts/emit_deck.py",
+    ".agents/skills/deck/scripts/resolve_artifacts.py",
+    ".agents/skills/deck/scripts/vendor_template.py",
+    ".agents/skills/deployed-system/SKILL.md",
+    ".agents/skills/deployed-system/agents/openai.yaml",
+    ".agents/skills/diagnosing-bugs/LICENSE",
+    ".agents/skills/diagnosing-bugs/SKILL.md",
+    ".agents/skills/diagnosing-bugs/agents/openai.yaml",
+    ".agents/skills/diagnosing-bugs/scripts/hitl-loop.template.sh",
+    ".agents/skills/domain-modeling/ADR-FORMAT.md",
+    ".agents/skills/domain-modeling/CONTEXT-FORMAT.md",
+    ".agents/skills/domain-modeling/LICENSE",
+    ".agents/skills/domain-modeling/SKILL.md",
+    ".agents/skills/domain-modeling/agents/openai.yaml",
+    ".agents/skills/econ-write/LICENSE",
+    ".agents/skills/econ-write/SKILL.md",
+    ".agents/skills/econ-write/references/empirical-work.md",
+    ".agents/skills/econ-write/references/field-conventions.md",
+    ".agents/skills/econ-write/references/identification-strategies.md",
+    ".agents/skills/econ-write/references/latex-tips.md",
+    ".agents/skills/econ-write/references/paper-structure.md",
+    ".agents/skills/econ-write/references/review-checklist.md",
+    ".agents/skills/econ-write/references/sections.md",
+    ".agents/skills/econ-write/references/specialized-tasks.md",
+    ".agents/skills/econ-write/references/style.md",
+    ".agents/skills/econ-write/references/tables-and-figures.md",
+    ".agents/skills/grill-me/LICENSE",
+    ".agents/skills/grill-me/SKILL.md",
+    ".agents/skills/grill-me/agents/openai.yaml",
+    ".agents/skills/grill-with-docs/LICENSE",
+    ".agents/skills/grill-with-docs/SKILL.md",
+    ".agents/skills/grill-with-docs/agents/openai.yaml",
+    ".agents/skills/grilling/LICENSE",
+    ".agents/skills/grilling/SKILL.md",
+    ".agents/skills/grilling/agents/openai.yaml",
+    ".agents/skills/handoff/LICENSE",
+    ".agents/skills/handoff/SKILL.md",
+    ".agents/skills/handoff/agents/openai.yaml",
+    ".agents/skills/humanize/SKILL.md",
+    ".agents/skills/humanize/agents/openai.yaml",
+    ".agents/skills/implement/LICENSE",
+    ".agents/skills/implement/SKILL.md",
+    ".agents/skills/implement/agents/openai.yaml",
+    ".agents/skills/improve-codebase-architecture/HTML-REPORT.md",
+    ".agents/skills/improve-codebase-architecture/LICENSE",
+    ".agents/skills/improve-codebase-architecture/SKILL.md",
+    ".agents/skills/improve-codebase-architecture/agents/openai.yaml",
+    ".agents/skills/papers-finder/SKILL.md",
+    ".agents/skills/pdf-artifact-extractor/SKILL.md",
+    ".agents/skills/pdf-artifact-extractor/agents/openai.yaml",
+    ".agents/skills/pdf-artifact-extractor/references/extraction-internals.md",
+    ".agents/skills/pdf-artifact-extractor/references/latex-inclusion.md",
+    ".agents/skills/pdf-artifact-extractor/references/schema.md",
+    ".agents/skills/pdf-artifact-extractor/references/troubleshooting.md",
+    ".agents/skills/pdf-artifact-extractor/scripts/economics_tables.py",
+    ".agents/skills/pdf-artifact-extractor/scripts/extract_pdf_artifacts.py",
+    ".agents/skills/proofread/SKILL.md",
+    ".agents/skills/proofread/agents/openai.yaml",
+    ".agents/skills/prototype/LICENSE",
+    ".agents/skills/prototype/LOGIC.md",
+    ".agents/skills/prototype/SKILL.md",
+    ".agents/skills/prototype/UI.md",
+    ".agents/skills/prototype/agents/openai.yaml",
+    ".agents/skills/research-standards/SKILL.md",
+    ".agents/skills/research-standards/references/seed-discipline.md",
+    ".agents/skills/research/SKILL.md",
+    ".agents/skills/resolving-merge-conflicts/LICENSE",
+    ".agents/skills/resolving-merge-conflicts/SKILL.md",
+    ".agents/skills/resolving-merge-conflicts/agents/openai.yaml",
+    ".agents/skills/scholar-causal/LICENSE",
+    ".agents/skills/scholar-causal/SKILL.md",
+    ".agents/skills/scholar-causal/agents/openai.yaml",
+    ".agents/skills/scholar-causal/references/dag-patterns.md",
+    ".agents/skills/scholar-causal/references/did-cs-workflow.R",
+    ".agents/skills/scholar-causal/references/identification-toolkit.md",
+    ".agents/skills/scholar-causal/references/matching-weighting.md",
+    ".agents/skills/scholar-causal/references/strategies.md",
+    ".agents/skills/scholar-citation/LICENSE",
+    ".agents/skills/scholar-citation/SKILL.md",
+    ".agents/skills/scholar-citation/agents/openai.yaml",
+    ".agents/skills/scholar-citation/references/mode-convert-export.md",
+    ".agents/skills/scholar-citation/references/mode-full-rebuild.md",
+    ".agents/skills/scholar-citation/references/mode-insert-audit.md",
+    ".agents/skills/scholar-citation/references/mode-reporting-summary.md",
+    ".agents/skills/scholar-citation/references/mode-verify-retraction.md",
+    ".agents/skills/scholar-citation/references/refmanager-backends.md",
+    ".agents/skills/scholar-code-review/LICENSE",
+    ".agents/skills/scholar-code-review/SKILL.md",
+    ".agents/skills/scholar-code-review/agents/openai.yaml",
+    ".agents/skills/scholar-code-review/references/code-review-standards.md",
+    ".agents/skills/scholar-replication-archives/LICENSE",
+    ".agents/skills/scholar-replication-archives/SKILL.md",
+    ".agents/skills/scholar-replication-archives/references/dataverse.md",
+    ".agents/skills/scholar-replication-archives/references/openicpsr.md",
+    ".agents/skills/scholar-replication-archives/references/osf.md",
+    ".agents/skills/scholar-replication-archives/references/repository-comparison.md",
+    ".agents/skills/scholar-replication-archives/references/zenodo.md",
+    ".agents/skills/scholar-replication/LICENSE",
+    ".agents/skills/scholar-replication/SKILL.md",
+    ".agents/skills/scholar-replication/agents/openai.yaml",
+    ".agents/skills/scholar-replication/references/replication-standards.md",
+    ".agents/skills/scholar-respond/LICENSE",
+    ".agents/skills/scholar-respond/SKILL.md",
+    ".agents/skills/scholar-respond/agents/openai.yaml",
+    ".agents/skills/scholar-respond/references/common-concerns.md",
+    ".agents/skills/scholar-respond/references/econ/blindspot.md",
+    ".agents/skills/scholar-respond/references/econ/contribution.md",
+    ".agents/skills/scholar-respond/references/econ/data-construction.md",
+    ".agents/skills/scholar-respond/references/econ/descriptive.md",
+    ".agents/skills/scholar-respond/references/econ/economic-magnitude.md",
+    ".agents/skills/scholar-respond/references/econ/experimental.md",
+    ".agents/skills/scholar-respond/references/econ/external-validity.md",
+    ".agents/skills/scholar-respond/references/econ/identification.md",
+    ".agents/skills/scholar-respond/references/econ/mechanism.md",
+    ".agents/skills/scholar-respond/references/econ/preregistration.md",
+    ".agents/skills/scholar-respond/references/econ/protocol.md",
+    ".agents/skills/scholar-respond/references/econ/reproducibility.md",
+    ".agents/skills/scholar-respond/references/econ/robustness.md",
+    ".agents/skills/scholar-respond/references/econ/router.md",
+    ".agents/skills/scholar-respond/references/econ/structural.md",
+    ".agents/skills/scholar-respond/references/econ/theory.md",
+    ".agents/skills/scholar-respond/references/econ/transparency.md",
+    ".agents/skills/scholar-respond/references/mode-1-simulate.md",
+    ".agents/skills/scholar-respond/references/mode-2-respond.md",
+    ".agents/skills/scholar-respond/references/mode-3-revise.md",
+    ".agents/skills/scholar-respond/references/mode-4-resubmit.md",
+    ".agents/skills/scholar-respond/references/mode-5-cover-letter.md",
+    ".agents/skills/scholar-respond/references/response-templates.md",
+    ".agents/skills/scholar-verify/LICENSE",
+    ".agents/skills/scholar-verify/SKILL.md",
+    ".agents/skills/scholar-verify/agents/openai.yaml",
+    ".agents/skills/scholar-verify/references/verification-standards.md",
+    ".agents/skills/setup-matt-pocock-skills/LICENSE",
+    ".agents/skills/setup-matt-pocock-skills/SKILL.md",
+    ".agents/skills/setup-matt-pocock-skills/agents/openai.yaml",
+    ".agents/skills/setup-matt-pocock-skills/domain.md",
+    ".agents/skills/setup-matt-pocock-skills/issue-tracker-github.md",
+    ".agents/skills/setup-matt-pocock-skills/issue-tracker-gitlab.md",
+    ".agents/skills/setup-matt-pocock-skills/issue-tracker-local.md",
+    ".agents/skills/setup-matt-pocock-skills/triage-labels.md",
+    ".agents/skills/slide-spec/SKILL.md",
+    ".agents/skills/slide-spec/agents/openai.yaml",
+    ".agents/skills/slide-spec/references/slide-spec-schema.md",
+    ".agents/skills/slide-spec/scripts/validate_slide_spec.py",
+    ".agents/skills/tdd/LICENSE",
+    ".agents/skills/tdd/SKILL.md",
+    ".agents/skills/tdd/agents/openai.yaml",
+    ".agents/skills/tdd/mocking.md",
+    ".agents/skills/tdd/tests.md",
+    ".agents/skills/teach/GLOSSARY-FORMAT.md",
+    ".agents/skills/teach/LEARNING-RECORD-FORMAT.md",
+    ".agents/skills/teach/LICENSE",
+    ".agents/skills/teach/MISSION-FORMAT.md",
+    ".agents/skills/teach/RESOURCES-FORMAT.md",
+    ".agents/skills/teach/SKILL.md",
+    ".agents/skills/teach/agents/openai.yaml",
+    ".agents/skills/technical-exploration/SKILL.md",
+    ".agents/skills/to-questionnaire/LICENSE",
+    ".agents/skills/to-questionnaire/SKILL.md",
+    ".agents/skills/to-questionnaire/agents/openai.yaml",
+    ".agents/skills/to-spec/LICENSE",
+    ".agents/skills/to-spec/SKILL.md",
+    ".agents/skills/to-spec/agents/openai.yaml",
+    ".agents/skills/to-tickets/LICENSE",
+    ".agents/skills/to-tickets/SKILL.md",
+    ".agents/skills/to-tickets/agents/openai.yaml",
+    ".agents/skills/tracker-prose/SKILL.md",
+    ".agents/skills/tracker-prose/references/tracker-prose.md",
+    ".agents/skills/triage/AGENT-BRIEF.md",
+    ".agents/skills/triage/LICENSE",
+    ".agents/skills/triage/OUT-OF-SCOPE.md",
+    ".agents/skills/triage/SKILL.md",
+    ".agents/skills/triage/agents/openai.yaml",
+    ".agents/skills/voice-profile/SKILL.md",
+    ".agents/skills/voice-profile/agents/openai.yaml",
+    ".agents/skills/wait-what/LICENSE",
+    ".agents/skills/wait-what/SKILL.md",
+    ".agents/skills/wait-what/agents/openai.yaml",
+    ".agents/skills/wayfinder/LICENSE",
+    ".agents/skills/wayfinder/SKILL.md",
+    ".agents/skills/wayfinder/agents/openai.yaml",
+    ".agents/skills/wizard/LICENSE",
+    ".agents/skills/wizard/SKILL.md",
+    ".agents/skills/wizard/agents/openai.yaml",
+    ".agents/skills/wizard/template.sh",
+    ".agents/skills/writing-for-agents/LICENSE",
+    ".agents/skills/writing-for-agents/SKILL-MECHANICS.md",
+    ".agents/skills/writing-for-agents/SKILL.md",
+    ".agents/skills/writing-for-agents/agents/openai.yaml",
+    ".claude/skills"
+  ]
+}

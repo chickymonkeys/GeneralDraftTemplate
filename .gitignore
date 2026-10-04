@@ -730,4 +730,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/linux,windows,macos,visualstudiocode,latex,microsoftoffice,libreoffice,git,stata,r,python,jupyternotebooks,data,database
+# AI Agents
+
+.claude/
+.opencode/
+.codex/
+.agents/
