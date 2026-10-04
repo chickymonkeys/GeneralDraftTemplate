@@ -3,6 +3,100 @@
 \ProvidesPackage{gdt-build}[2026/10/02 Cross-document references]
 \RequirePackage{xr}
 
+% Read literal lines instead of executing arbitrary definitions. The same
+% line grammar is used by latexmkrc, including for direct pdfLaTeX builds.
+\ExplSyntaxOn
+\ior_new:N \l_gdt_names_ior
+\prop_new:N \l_gdt_names_prop
+\seq_new:N \l_gdt_names_match_seq
+\seq_new:N \l_gdt_names_seen_seq
+\tl_new:N \l_gdt_names_line_tl
+\tl_new:N \l_gdt_names_role_tl
+\tl_new:N \l_gdt_names_base_tl
+\msg_new:nnn {gdt} {names} {Invalid~gdt-names.tex:~#1.\MessageBreak See~docs/building.md;~use~three~literal~basename~definitions.}
+\file_if_exist:nF {gdt-names.tex}
+  {\msg_fatal:nnn {gdt} {names} {file~missing}}
+\ior_open:Nn \l_gdt_names_ior {gdt-names.tex}
+\ior_str_map_inline:Nn \l_gdt_names_ior
+  {
+    \tl_set:Nn \l_gdt_names_line_tl {#1}
+    \regex_replace_once:nnN {\%.*} {} \l_gdt_names_line_tl
+    \regex_replace_all:nnN {\A\s+|\s+\Z} {} \l_gdt_names_line_tl
+    \tl_if_empty:NF \l_gdt_names_line_tl
+      {
+        \regex_extract_once:nVNTF
+          {\A \\def\\GDT(Main|Appendix|Combined)Base\{([A-Za-z0-9](?:[A-Za-z0-9_.\-]*[A-Za-z0-9_\-])?)\} \Z}
+          \l_gdt_names_line_tl \l_gdt_names_match_seq
+          {
+            \tl_set:Nx \l_gdt_names_role_tl {\seq_item:Nn \l_gdt_names_match_seq {2}}
+            \tl_set:Nx \l_gdt_names_base_tl {\seq_item:Nn \l_gdt_names_match_seq {3}}
+            \exp_args:NNV \prop_if_in:NnT \l_gdt_names_prop \l_gdt_names_role_tl
+              {\msg_fatal:nnn {gdt} {names} {duplicate~role}}
+            \tl_set:Nx \l_tmpa_tl {\str_lowercase:f {\l_gdt_names_base_tl}}
+            \exp_args:NNV \seq_if_in:NnT \l_gdt_names_seen_seq \l_tmpa_tl
+              {\msg_fatal:nnn {gdt} {names} {case-insensitive~basename~collision}}
+            \seq_put_right:NV \l_gdt_names_seen_seq \l_tmpa_tl
+            \prop_put:NVV \l_gdt_names_prop \l_gdt_names_role_tl \l_gdt_names_base_tl
+            \cs_gset:cpx {GDT\l_gdt_names_role_tl Base} {\l_gdt_names_base_tl}
+          }
+          {\msg_fatal:nnn {gdt} {names} {malformed~line~or~unsupported~basename}}
+      }
+  }
+\ior_close:N \l_gdt_names_ior
+\clist_map_inline:nn {Main,Appendix,Combined}
+  {
+    \prop_if_in:NnF \l_gdt_names_prop {#1}
+      {\msg_fatal:nnn {gdt} {names} {missing~GDT#1Base}}
+  }
+% A companion's recorder lists included sources, graphics, and bibliography
+% inputs that are not visible from its entry wrapper. Register those too so
+% editing a nested source can start the selected root's build callback.
+\ior_new:N \l_gdt_dependencies_ior
+\seq_new:N \l_gdt_dependencies_seq
+\seq_new:N \l_gdt_generated_seq
+\tl_new:N \l_gdt_dependency_tl
+\cs_new_protected:Npn \gdt_track_file:n #1
+  {\openin\GDTExternalSource=#1\relax \closein\GDTExternalSource}
+\cs_new_protected:Npn \gdt_track_document:n #1
+  {
+    \gdt_track_file:n {#1.tex}
+    \file_if_exist:nT {#1.fls}
+      {
+        \group_begin:
+        \seq_clear:N \l_gdt_dependencies_seq
+        \seq_clear:N \l_gdt_generated_seq
+        \ior_open:Nn \l_gdt_dependencies_ior {#1.fls}
+        \ior_str_map_inline:Nn \l_gdt_dependencies_ior
+          {
+            \str_if_eq:eeTF {\str_range:nnn {##1} {1} {6}} {INPUT~}
+              {
+                \tl_set:Nx \l_gdt_dependency_tl {\str_range:nnn {##1} {7} {-1}}
+                \seq_put_right:NV \l_gdt_dependencies_seq \l_gdt_dependency_tl
+              }
+              {
+                \str_if_eq:eeT {\str_range:nnn {##1} {1} {7}} {OUTPUT~}
+                  {
+                    \tl_set:Nx \l_gdt_dependency_tl {\str_range:nnn {##1} {8} {-1}}
+                    \seq_put_right:NV \l_gdt_generated_seq \l_gdt_dependency_tl
+                  }
+              }
+          }
+        \ior_close:N \l_gdt_dependencies_ior
+        \seq_remove_duplicates:N \l_gdt_dependencies_seq
+        \seq_map_inline:Nn \l_gdt_dependencies_seq
+          {
+            \seq_if_in:NnF \l_gdt_generated_seq {##1}
+              {
+                \regex_match:nnF {\.(aux|bbl|out|toc|lof|lot|fls|log|bcf)\Z} {##1}
+                  {\gdt_track_file:n {"##1"}}
+              }
+          }
+        \group_end:
+      }
+  }
+\newcommand{\GDTTrackDocument}[1]{\exp_args:Nx \gdt_track_document:n {#1}}
+\ExplSyntaxOff
+
 % The imported draft keeps its existing ../references path. Biber resolves
 % resource paths relative to the root target instead, hence the prefix.
 \ifdefined\GDTBibliographyBase
@@ -20,3 +114,5 @@
   \closein\GDTExternalSource
   \externaldocument[][nocite]{#2}%
 }
+\newcommand{\GDTMainDocument}{\GDTTrackDocument{\GDTMainBase}\GDTExternalDocument{\GDTMainBase.tex}{\GDTMainBase}}
+\newcommand{\GDTAppendixDocument}{\GDTTrackDocument{\GDTAppendixBase}\GDTExternalDocument{\GDTAppendixBase.tex}{\GDTAppendixBase}}

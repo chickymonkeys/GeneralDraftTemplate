@@ -1,4 +1,9 @@
 % !TeX program = pdflatex
+% Appendix root: compile this file directly; it needs no !TeX root comment.
+% If renamed, update \GDTAppendixBase in gdt-names.tex.
+% In each included appendix source, add a comment pointing to this root,
+% relative to that source, e.g. % !TeX root = ../appendix.tex for a file in draft/.
+% Update those root comments after renaming, then restart VimTeX compilation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Document-Specific Settings
@@ -27,7 +32,7 @@
 %----------------------------------------------------------------------------- %
 
 \usepackage{gdt-build}
-\GDTExternalDocument{main.tex}{main}
+\GDTMainDocument
 \newcommand*{\RefsPath}{references}
 \addbibresource{\RefsPath/references.bib}
 

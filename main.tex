@@ -1,4 +1,9 @@
 % !TeX program = pdflatex
+% Manuscript root: compile this file directly; it needs no !TeX root comment.
+% If renamed, update \GDTMainBase in gdt-names.tex.
+% In each included manuscript source, add a comment pointing to this root,
+% relative to that source, e.g. % !TeX root = ../main.tex for a file in draft/.
+% Update those root comments after renaming, then restart VimTeX compilation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Document-Specific Settings
@@ -37,7 +42,7 @@
 %   Companion Cross-References                                                  %
 %----------------------------------------------------------------------------- %
 \usepackage{gdt-build}
-\GDTExternalDocument{appendix.tex}{appendix}
+\GDTAppendixDocument
 
 % ------------------------------------------------------------------------------
 %   Data loader from .dat files

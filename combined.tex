@@ -1,15 +1,17 @@
 % !TeX program = pdflatex
+% Combined root: compile this file directly; it needs no !TeX root comment.
+% If renamed, update \GDTCombinedBase in gdt-names.tex.
+% Included manuscript/appendix sources should point their !TeX root comments
+% to their standalone entry files, not to this PDF-combining document.
 
 \documentclass[11pt]{article}
 \usepackage{pdfpages}
-\newread\GDTCombinedSource
+\usepackage{gdt-build}
 
 \begin{document}
 % Track source edits even when the included PDFs were last built earlier.
-\openin\GDTCombinedSource=main.tex\relax
-\closein\GDTCombinedSource
-\openin\GDTCombinedSource=appendix.tex\relax
-\closein\GDTCombinedSource
-\includepdf[pages=-]{main.pdf}
-\includepdf[pages=-]{appendix.pdf}
+\GDTTrackDocument{\GDTMainBase}
+\GDTTrackDocument{\GDTAppendixBase}
+\includepdf[pages=-]{\GDTMainBase.pdf}
+\includepdf[pages=-]{\GDTAppendixBase.pdf}
 \end{document}
