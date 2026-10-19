@@ -7,11 +7,22 @@ Every document compiles the same way on Overleaf and locally, with the settings 
 - **Shell escape**, for the `svg` package, which converts SVG figures with Inkscape.
 - **Compiling in the source's folder** (`$do_cd`), so that a path such as `../figures/` resolves wherever `latexmk` is started.
 - **Engine.** A document whose first lines say `% !TeX program = xelatex` (or `lualatex`) is compiled with that engine even when `latexmk` is asked for pdfLaTeX, as Overleaf and VimTeX ask by default. Slides in XeLaTeX and a paper in pdfLaTeX then share Overleaf's compiler setting, pdfLaTeX.
-- **Cross-document references.** The manuscript imports the appendix's labels with `\externaldocument[][nocite]{appendix}` (package `xr`), and the appendix imports the manuscript's. Each reads the other's `.aux` file beside its source. `latexmk` compiles the other document first, in its own folder, when that `.aux` file is missing or the other document's `.tex` file has changed since. A document being compiled is never compiled again by the other, which reads the labels saved so far.
+- **Cross-document references.** The manuscript imports the appendix's labels with `\externaldocument[][nocite]{appendix}` (package `xr`), and the appendix imports the manuscript's. Each reads the other's `.aux` file beside its source. `latexmk` compiles the other document first, in its own folder, when that `.aux` file is missing or the other document's `.tex` file has changed since. The document compiled for its labels does not compile the first one again, but reads the labels saved so far.
 - **Combined document.** `combined.tex` attaches the two PDFs with `\includepdf`. Before `latexmk` looks at it, both documents are brought up to date.
 - **Overleaf's file names**, described [below](#on-overleaf).
 
 The other document is compiled again only when its own `.tex` file changes. An edit to a file it includes, a figure, or a table does not recompile it, and its PDF made along the way can show this document's labels as they were. Compile it directly to bring it up to date, or compile the combined document.
+
+## One compiler per folder
+
+Run one compiler at a time in a folder. When the manuscript is compiled, the appendix can be compiled with it, for its labels, in the same folder: its `.aux`, `.pdf`, log, and Biber files are written there too, and the reverse. A second compiler in that folder, whether a continuous one for the other document or a single build, writes the same files at the same time. The two overwrite each other's files, and TeX can read an `.aux` file that the other compiler is halfway through writing. Nothing prevents it, so:
+
+- Keep one continuous compiler (`latexmk -pvc`, VimTeX's `:VimtexCompile`) running per folder. It compiles the other document when needed and picks up edits to it, so a second one is never needed.
+- To switch documents, stop the compiler (`:VimtexStop`) and start it from the other document.
+- To build while the editor's compiler runs, for a check or a script, copy the sources to another folder and build there.
+- Documents in different folders, such as `draft/` and `slides/`, can compile side by side.
+
+Overleaf compiles in a folder of its own, so a compile there never collides with a local one.
 
 ## Names and folders
 
@@ -47,7 +58,7 @@ Do not upload `.aux`, `.bbl`, or compiled PDF files into the project: Overleaf c
 
 VimTeX compiles with `latexmk` by default and starts it in the root file's folder, so it reads the project's settings; nothing needs configuring. Keep the PDFs beside the sources, as VimTeX does by default and as Overleaf does. With `-outdir` (VimTeX's `out_dir`), the document being compiled goes to that folder, but the other document is still compiled beside its source.
 
-Run one continuous compiler (`latexmk -pvc`, `:VimtexCompile`) per folder: it compiles the other document when needed and picks up edits to it. A second compiler in the same folder, for the other document, overwrites the same files. Switch documents by stopping the compiler (`:VimtexStop`) and starting it in the other document.
+Keep to [one compiler per folder](#one-compiler-per-folder): one `:VimtexCompile` at a time, stopped with `:VimtexStop` before compiling the other document.
 
 Do not add `-norc` or replace the pdfLaTeX command with `-pdflatex=...`: both bypass the settings.
 
@@ -75,6 +86,7 @@ The pixels do not change. XeLaTeX is not affected either way.
 
 - **`??` for a reference to the other document:** compile the other document, then this one. Its log shows why it failed, if it did. The first passes of a clean build can warn about such labels until the other document has compiled.
 - **`xr: NAME.tex failed to compile; see NAME.log`:** the other document has an error. This document still compiles; once the error is fixed, the next compile of either document compiles it again.
+- **Errors in an `.aux` file (`File ended while scanning`, `Runaway argument`), or a PDF that switches between versions:** two compilers ran in the same folder. Stop all but one, clean, and compile again; see [One compiler per folder](#one-compiler-per-folder).
 - **A stale or wrong PDF on Overleaf:** **Recompile from scratch**.
 - **Stale files locally:** stop the continuous compiler, then clean both documents and compile again. `-C` also removes the PDFs.
 

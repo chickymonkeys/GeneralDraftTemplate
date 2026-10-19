@@ -14,6 +14,8 @@ latexmk -pdf combined.tex   # the manuscript followed by the appendix, as one PD
 
 The manuscript and the appendix import each other's labels with the `xr` package (`\externaldocument`). `latexmkrc` compiles the other document first when its labels are missing or its `.tex` file has changed, so an edit to one document costs that document's passes alone. `latexmk` runs Biber. The combined target brings both PDFs up to date before attaching them.
 
+**Run one compiler at a time per folder.** Compiling one document writes the other document's files too, so two compilers in the same folder overwrite each other's files: for example, continuous compilers (`latexmk -pvc`, VimTeX's `:VimtexCompile`) for the manuscript and for the appendix. One continuous compiler is enough, since it compiles the other document when needed and picks up edits to it. To switch documents, stop it and start it from the other document. Overleaf compiles in a folder of its own, so a compile there never collides with a local one. [Building documents](docs/building.md#one-compiler-per-folder) says more.
+
 The same `latexmkrc` works on Overleaf, which reads it from the project root: choose the document as **Main document** and leave the compiler on pdfLaTeX. VimTeX uses `latexmk` and reads the same file. See [Building documents](docs/building.md) for how it works, Overleaf, editors, and troubleshooting.
 
 ## Choosing document filenames

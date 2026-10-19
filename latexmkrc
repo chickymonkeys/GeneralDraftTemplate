@@ -69,8 +69,10 @@ if ($xr_source ne '') {
 # Cross-document references (package xr). \externaldocument{NAME} reads
 # NAME.aux beside the source. latexmk makes it, when it is missing or NAME.tex
 # has changed, by compiling NAME.tex in its own folder. The manuscript and the
-# appendix import each other's labels: a document that is being compiled is not
-# compiled again by the other, which reads the labels it has saved so far.
+# appendix import each other's labels: the document compiled for its labels
+# does not compile the first one again, but reads the labels saved so far.
+# A compile thus writes the other document's files too: run one compiler at a
+# time per folder, or two will overwrite each other's files.
 push @file_not_found, '^No file\s*(.+)\s*$';
 add_cus_dep('tex', 'aux', 0, 'xr_companion');
 
