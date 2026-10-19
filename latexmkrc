@@ -3,11 +3,13 @@
 # changed since this job last built it, or it was built before this document
 # had labels. This document's labels never trigger a companion rebuild, so an
 # edit costs one document's passes. The combined target rebuilds both until
-# their labels agree. latexmk itself handles Biber and reruns.
+# their labels agree. latexmk itself handles Biber and reruns. A companion that
+# fails to build does not stop this document.
 use File::Copy qw(copy);
 use File::Spec;
 use File::Basename qw(dirname basename);
 use Config;
+use Cwd ();
 use Digest::MD5;
 use Fcntl qw(:flock);
 use IO::Handle;
@@ -206,14 +208,51 @@ sub gdt_stale {
     return '';
 }
 
+# Interrupted passes -----------------------------------------------------------
+
+# A pass stopped by a signal (a compiler stopped from the editor, say) leaves
+# its files cut off mid-write. TeX then stops on them in every later pass, and
+# latexmk, which recorded the stopped pass as failed, sees nothing to do. TeX
+# writes whole lines, Biber's control file ends with its closing tag and a PDF
+# with %%EOF, so a file that does not is removed and written again.
+sub gdt_incomplete {
+    my ($path) = @_;
+    my $size = -s $path or return 0;
+    open my $fh, '<:raw', $path or return 0;
+    my $n = $size < 1024 ? $size : 1024;
+    seek $fh, -$n, 2;
+    read $fh, my $tail, $n;
+    close $fh;
+    return $tail !~ m{</bcf:controlfile>\s*\z} if $path =~ /\.bcf\z/i;
+    return $tail !~ /%%EOF\s*\z/ if $path =~ /\.pdf\z/i;
+    return $tail !~ /\n\z/;
+}
+
+# Only for a document that no other process is compiling.
+sub gdt_repair {
+    my ($job, $aux, $out) = @_;
+    ($aux, $out) = ($aux_dir, $out_dir) if @_ == 1;
+    my @files = ((map { gdt_file($aux, $job, $_) } qw(aux bcf toc lof lot out)),
+        gdt_file($out, $job, 'pdf'));
+    for my $file (grep { gdt_incomplete($_) } @files) {
+        print 'GDT: removed ', basename($file), ", which an interrupted pass left incomplete.\n"
+            if unlink $file;
+    }
+}
+
 # Build locks: one compiler per document and auxiliary directory ---------------
 
 my %gdt_locks;
 
+sub gdt_lock_path {
+    my ($aux_file, $kind) = @_;
+    my $key = Digest::MD5::md5_hex($aux_file);
+    return File::Spec->catfile(File::Spec->tmpdir, "gdt-$key$kind.lock");
+}
+
 sub gdt_lock_handle {
     my ($base) = @_;
-    my $key = Digest::MD5::md5_hex(gdt_file($aux_dir, $base, 'aux'));
-    open my $fh, '+>>', File::Spec->catfile(File::Spec->tmpdir, "gdt-$key.lock") or return;
+    open my $fh, '+>>', gdt_lock_path(gdt_file($aux_dir, $base, 'aux'), '') or return;
     return $fh;
 }
 
@@ -249,18 +288,41 @@ sub gdt_lock_root {
     return 0;
 }
 
-# Rebuild $doc for this job if gdt_stale says so. Returns (status, built).
+# Pass locks: TeX empties a document's auxiliary file when a pass starts and
+# fills it as the pass runs, so another compiler must not read it meanwhile. A
+# pass holds its own document's lock exclusively and those of the documents it
+# reads shared, all taken in one order, so compilers cannot deadlock.
+sub gdt_pass_locks {
+    my (%mode) = @_;
+    my %path = map { $_ => gdt_lock_path(gdt_file($aux_dir, $_, 'aux'), '.pass') } keys %mode;
+    my @held;
+    for my $doc (sort { $path{$a} cmp $path{$b} } keys %mode) {
+        open my $fh, '>>', $path{$doc} or next;
+        unless (flock $fh, $mode{$doc} | LOCK_NB) {
+            print "GDT: waiting for the current pass of $doc to finish.\n";
+            flock $fh, $mode{$doc} or next;
+        }
+        push @held, $fh;
+    }
+    return @held;
+}
+
+# Rebuild $doc for this job if gdt_stale says so. Returns (status, built). A
+# failed build is reported but does not stop this document, so that an error in
+# one document cannot block the other.
 sub gdt_refresh {
     my ($job, $doc, $ignore, $need_pdf, %names) = @_;
     unless (-f "$doc.tex") {
         warn "GDT: configured companion source $doc.tex is missing; check gdt-names.tex.\n";
         return (1, 0);
     }
+    my $fh = gdt_lock_handle($doc);
+    my $free = !$fh || flock $fh, LOCK_EX | LOCK_NB;
+    gdt_repair($doc) if $free;
     my $file = gdt_file($aux_dir, $job, 'gdt.aux');
     my $state = gdt_read_state($file);
     my $reason = gdt_stale($state, $doc, $ignore, $need_pdf, %names) or return (0, 0);
-    my $fh = gdt_lock_handle($doc);
-    if ($fh && !flock $fh, LOCK_EX | LOCK_NB) {
+    unless ($free) {
         print "GDT: $doc is being compiled by another process; using its current labels.\n";
         return (0, 0);
     }
@@ -268,7 +330,11 @@ sub gdt_refresh {
     print "GDT: building $doc because $reason.\n";
     my $status = gdt_make($doc);
     close delete $gdt_locks{$doc} if $fh;
-    return ($status, 0) if $status != 0;
+    if ($status != 0) {
+        warn "GDT: $doc failed to build, so references to it may be missing. See ",
+            basename(gdt_file($aux_dir, $doc, 'log')), " for the error.\n";
+        return (0, 0);
+    }
     gdt_record($state, $doc, %names);
     gdt_write_state($file, $state);
     return (0, 1);
@@ -294,6 +360,8 @@ sub gdt_pdflatex {
     if (defined $role && !$child) {
         my $status = gdt_lock_root($base);
         return $status if $status;
+        # A companion build's files were repaired by the job that started it.
+        gdt_repair($_) for grep { length } $job, ($job ne $base ? $base : '');
     }
     return 1 if $standalone && gdt_sync_aux($base);
 
@@ -322,6 +390,12 @@ sub gdt_pdflatex {
     local $ENV{TEXINPUTS} = (defined $out_dir && length $out_dir)
         ? File::Spec->rel2abs($out_dir) . $Config{path_sep} . ($ENV{TEXINPUTS} // '')
         : ($ENV{TEXINPUTS} // '');
+    my @pass;
+    if (defined $role) {
+        @pass = gdt_pass_locks($base => LOCK_EX, map { $_ => LOCK_SH } @gdt_tracked);
+        # With no pass of them running, an incomplete file is a leftover.
+        gdt_repair($_) for @gdt_tracked;
+    }
     my $status = system 'pdflatex', '-shell-escape', @args;
     return $status if $status != 0;
     return $standalone ? gdt_sync_aux($base) : 0;
@@ -341,3 +415,37 @@ sub gdt_track_companions {
     return 0;
 }
 add_hook('after_xlatex_analysis', \&gdt_track_companions) if defined &add_hook;
+
+# Repair the selected document before latexmk examines it, or a compile that
+# was stopped mid-pass finds nothing to do when it is started again. latexmk
+# reads this file before its command line, so read the options that place the
+# document's files here.
+sub gdt_repair_selected {
+    return if $ENV{GDT_XR_COMPANION};
+    my (%opt, @files);
+    my @args = @ARGV;
+    while (defined(my $arg = shift @args)) {
+        if ($arg =~ /^--?[er]\z/) { shift @args; next }
+        if ($arg =~ /^--?(outdir|output-directory|auxdir|aux-directory|jobname)=(.+)\z/) {
+            $opt{$1} = $2;
+            next;
+        }
+        push @files, $arg unless $arg =~ /^-/;
+    }
+    return unless @files == 1;
+    my %names = gdt_names();
+    my $base = basename($files[0]);
+    $base =~ s/\.tex\z//;
+    return unless grep { $_ eq $base } values %names;
+    my $dir = Cwd::abs_path(dirname(File::Spec->rel2abs($files[0]))) // return;
+    my $out = $opt{outdir} // $opt{'output-directory'} // $out_dir // '';
+    my $aux = $opt{auxdir} // $opt{'aux-directory'} // $aux_dir // '';
+    $aux = $out unless length $aux;
+    my ($at_out, $at_aux) = map { File::Spec->rel2abs(length $_ ? $_ : '.', $dir) } $out, $aux;
+    my $job = $opt{jobname} // ((defined $jobname && length $jobname) ? $jobname : $base);
+    open my $fh, '+>>', gdt_lock_path(gdt_file($at_aux, $base, 'aux'), '') or return;
+    flock $fh, LOCK_EX | LOCK_NB or return; # another compiler owns the document
+    gdt_repair($_, $at_aux, $at_out) for grep { length } $job, ($job ne $base ? $base : '');
+    close $fh;
+}
+gdt_repair_selected();
