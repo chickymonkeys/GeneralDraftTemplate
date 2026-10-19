@@ -9,9 +9,6 @@
 \usepackage{gdt-build}
 
 \begin{document}
-% Track source edits even when the included PDFs were last built earlier.
-\GDTTrackDocument{\GDTMainBase}
-\GDTTrackDocument{\GDTAppendixBase}
 \includepdf[pages=-]{\GDTMainBase.pdf}
 \includepdf[pages=-]{\GDTAppendixBase.pdf}
 \end{document}

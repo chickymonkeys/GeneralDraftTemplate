@@ -48,53 +48,11 @@
     \prop_if_in:NnF \l_gdt_names_prop {#1}
       {\msg_fatal:nnn {gdt} {names} {missing~GDT#1Base}}
   }
-% A companion's recorder lists included sources, graphics, and bibliography
-% inputs that are not visible from its entry wrapper. Register those too so
-% editing a nested source can start the selected root's build callback.
-\ior_new:N \l_gdt_dependencies_ior
-\seq_new:N \l_gdt_dependencies_seq
-\seq_new:N \l_gdt_generated_seq
-\tl_new:N \l_gdt_dependency_tl
-\cs_new_protected:Npn \gdt_track_file:n #1
-  {\openin\GDTExternalSource=#1\relax \closein\GDTExternalSource}
-\cs_new_protected:Npn \gdt_track_document:n #1
-  {
-    \gdt_track_file:n {#1.tex}
-    \file_if_exist:nT {#1.fls}
-      {
-        \group_begin:
-        \seq_clear:N \l_gdt_dependencies_seq
-        \seq_clear:N \l_gdt_generated_seq
-        \ior_open:Nn \l_gdt_dependencies_ior {#1.fls}
-        \ior_str_map_inline:Nn \l_gdt_dependencies_ior
-          {
-            \str_if_eq:eeTF {\str_range:nnn {##1} {1} {6}} {INPUT~}
-              {
-                \tl_set:Nx \l_gdt_dependency_tl {\str_range:nnn {##1} {7} {-1}}
-                \seq_put_right:NV \l_gdt_dependencies_seq \l_gdt_dependency_tl
-              }
-              {
-                \str_if_eq:eeT {\str_range:nnn {##1} {1} {7}} {OUTPUT~}
-                  {
-                    \tl_set:Nx \l_gdt_dependency_tl {\str_range:nnn {##1} {8} {-1}}
-                    \seq_put_right:NV \l_gdt_generated_seq \l_gdt_dependency_tl
-                  }
-              }
-          }
-        \ior_close:N \l_gdt_dependencies_ior
-        \seq_remove_duplicates:N \l_gdt_dependencies_seq
-        \seq_map_inline:Nn \l_gdt_dependencies_seq
-          {
-            \seq_if_in:NnF \l_gdt_generated_seq {##1}
-              {
-                \regex_match:nnF {\.(aux|bbl|out|toc|lof|lot|fls|log|bcf)\Z} {##1}
-                  {\gdt_track_file:n {"##1"}}
-              }
-          }
-        \group_end:
-      }
-  }
-\newcommand{\GDTTrackDocument}[1]{\exp_args:Nx \gdt_track_document:n {#1}}
+% latexmkrc makes each pass depend on the companion's sources. TeX does not
+% open them, so this document's recorder file lists only what it reads.
+% \GDTTrackDocument does nothing; it remains for combined roots written for
+% earlier versions of the template.
+\newcommand{\GDTTrackDocument}[1]{}
 \ExplSyntaxOff
 
 % The imported draft keeps its existing ../references path. Biber resolves
@@ -106,13 +64,8 @@
   }
 \fi
 
-% Open the other source to register it as a latexmk dependency even when its
-% auxiliary file already exists. Its generated labels use root target names.
-\newread\GDTExternalSource
-\newcommand{\GDTExternalDocument}[2]{%
-  \openin\GDTExternalSource=#1\relax
-  \closein\GDTExternalSource
-  \externaldocument[][nocite]{#2}%
-}
-\newcommand{\GDTMainDocument}{\GDTTrackDocument{\GDTMainBase}\GDTExternalDocument{\GDTMainBase.tex}{\GDTMainBase}}
-\newcommand{\GDTAppendixDocument}{\GDTTrackDocument{\GDTAppendixBase}\GDTExternalDocument{\GDTAppendixBase.tex}{\GDTAppendixBase}}
+% Import the other document's labels. The first argument, its source, is no
+% longer read and remains for compatibility. Labels use root target names.
+\newcommand{\GDTExternalDocument}[2]{\externaldocument[][nocite]{#2}}
+\newcommand{\GDTMainDocument}{\GDTExternalDocument{\GDTMainBase.tex}{\GDTMainBase}}
+\newcommand{\GDTAppendixDocument}{\GDTExternalDocument{\GDTAppendixBase.tex}{\GDTAppendixBase}}
