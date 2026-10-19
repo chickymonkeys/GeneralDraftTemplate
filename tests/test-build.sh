@@ -42,6 +42,20 @@ def fixture(project, names):
     config(project, names)
 
 
+def wrap(project, names):
+    # Move both standalone bodies to draft/ behind thin root entry wrappers.
+    (project / 'draft').mkdir()
+    for i in (0, 1):
+        source = project / f'{names[i]}.tex'
+        body = source.read_text().replace('\\documentclass{article}\n', '')
+        body = body.replace('\\input{body}', '\\input{draft/body}')
+        body = f'% !TeX root = ../{names[i]}.tex\n' + body
+        (project / 'draft' / f'{i}.tex').write_text(body)
+        source.write_text('\\documentclass{article}\n\\usepackage{import}\n'
+                          f'\\import{{draft/}}{{{i}.tex}}\n')
+    (project / 'body.tex').rename(project / 'draft/body.tex')
+
+
 def build(project, name, options=(), ok=True):
     return run(project, ['latexmk', '-pdf', '-silent', '-interaction=nonstopmode',
                          '-halt-on-error', *options, f'{name}.tex'], ok)
@@ -208,19 +222,112 @@ with tempfile.TemporaryDirectory(prefix='gdt-build-') as tmp:
 
     p = root / 'wrappers'
     fixture(p, variants[1])
-    (p / 'draft').mkdir()
-    for i, helper in ((0, 'GDTAppendixDocument'), (1, 'GDTMainDocument')):
-        source = p / f'{names[i]}.tex'
-        body = source.read_text().replace('\\documentclass{article}\n', '')
-        body = body.replace('\\input{body}', '\\input{draft/body}')
-        body = f'% !TeX root = ../{names[i]}.tex\n' + body
-        (p / 'draft' / f'{i}.tex').write_text(body)
-        source.write_text('\\documentclass{article}\n\\usepackage{import}\n'
-                         f'\\import{{draft/}}{{{i}.tex}}\n')
-    (p / 'body.tex').rename(p / 'draft/body.tex')
+    wrap(p, names)
     build(p, names[2])
     resolved(p, names, role=2)
     print('PASS: renamed nested entry wrappers', flush=True)
+
+    # Only the companion's own sources make it stale; this document's labels do not.
+    q = root / 'incremental'
+    fixture(q, variants[0])
+    build(q, 'main')
+    stamp = (q / 'appendix.pdf').stat().st_mtime_ns
+    (q / 'body.tex').write_text('\\setcounter{section}{4}\n'
+                                + (repo / 'tests/fixtures/body.tex').read_text())
+    out = build(q, 'main')
+    assert 'GDT: building' not in out, out
+    assert (q / 'appendix.pdf').stat().st_mtime_ns == stamp
+    assert '\\newlabel{main:result}{{5}' in (q / 'main.aux').read_text()
+    build(q, 'appendix')
+    assert 'Manuscript reference: 5.' in text(q, 'appendix.pdf')
+    app = q / 'appendix.tex'
+    app.write_text(app.read_text().replace('{6}', '{8}'))
+    out = build(q, 'main')
+    assert 'GDT: building appendix because appendix.tex changed' in out, out
+    assert 'Appendix reference: 9.' in text(q, 'main.pdf')
+    run(q, ['latexmk', '-c', 'main.tex'])
+    assert not (q / 'main.gdt.aux').exists()
+    print('PASS: companion rebuilt only when its own sources change', flush=True)
+
+    q = root / 'wrapper-edits'
+    fixture(q, names)
+    wrap(q, names)
+    build(q, names[0])
+    body = q / 'draft/1.tex'
+    body.write_text(body.read_text().replace('{6}', '{8}'))
+    out = build(q, names[0])
+    assert f'GDT: building {names[1]} because 1.tex changed' in out, out
+    assert 'Appendix reference: 9.' in text(q, f'{names[0]}.pdf')
+    print('PASS: nested companion sources', flush=True)
+
+    # Overleaf runs this command (services/clsi/app/js/LatexRunner.js) and, before
+    # each compile, deletes generated files except output.*, *.aux and *.pdf, and
+    # its own final outputs (ResourceWriter.isExtraneousFile).
+    def overleaf(project, name):
+        out = run(project, ['latexmk', '-cd', '-jobname=output', f'-auxdir={project}',
+                            f'-outdir={project}', '-synctex=1', '-interaction=batchmode',
+                            '-time', '-f', '-pdf', str(project / f'{name}.tex')])
+        pdf = text(project, 'output.pdf')
+        for item in project.iterdir():
+            rel = item.name
+            if item.is_dir() or rel in sources:
+                continue
+            keep = rel.startswith('output.') or rel.endswith(('.aux', '.pdf'))
+            if not keep or rel in ('output.pdf', 'output.log', 'output.synctex.gz'):
+                item.unlink()
+        return out, pdf
+
+    q = root / 'overleaf'
+    fixture(q, variants[0])
+    sources = {item.name for item in q.iterdir()}
+    out, pdf = overleaf(q, 'main')
+    assert 'Appendix reference: 7.' in pdf, pdf
+    assert 'Manuscript reference: 1.' in text(q, 'appendix.pdf')
+    out, pdf = overleaf(q, 'main')
+    assert 'GDT: building' not in out and 'Appendix reference: 7.' in pdf, out
+    (q / 'body.tex').write_text('\\setcounter{section}{4}\n'
+                                + (repo / 'tests/fixtures/body.tex').read_text())
+    out, pdf = overleaf(q, 'main')
+    assert 'GDT: building' not in out and 'Appendix reference: 7.' in pdf, out
+    app = q / 'appendix.tex'
+    app.write_text(app.read_text().replace('{6}', '{8}'))
+    out, pdf = overleaf(q, 'main')
+    assert 'GDT: building appendix because appendix.tex changed' in out, out
+    assert 'Appendix reference: 9.' in pdf, pdf
+    out, pdf = overleaf(q, 'appendix')
+    assert 'Manuscript reference: 5.' in pdf, pdf
+    out, pdf = overleaf(q, 'combined')
+    assert pdf.index('MANUSCRIPT-FIRST') < pdf.index('APPENDIX-SECOND'), pdf
+    assert 'Appendix reference: 9.' in pdf and 'Manuscript reference: 5.' in pdf, pdf
+    print('PASS: Overleaf compiles keep companion state between compiles', flush=True)
+
+    # A running compiler owns its document: others use its labels, never build it.
+    q = root / 'concurrent'
+    fixture(q, variants[0])
+    build(q, 'main')
+    app = q / 'appendix.tex'
+    app.write_text(app.read_text().replace('{6}', '{8}'))
+    log = (q / 'continuous.txt').open('w')
+    proc = subprocess.Popen(['latexmk', '-pdf', '-pvc', '-view=none', '-silent',
+                             '-interaction=nonstopmode', '-halt-on-error', 'appendix.tex'],
+                            cwd=q, stdout=log, stderr=subprocess.STDOUT)
+    try:
+        deadline = time.monotonic() + 45
+        while '\\newlabel{app:result}{{9}' not in (q / 'appendix.aux').read_text():
+            assert time.monotonic() < deadline and proc.poll() is None, \
+                (q / 'continuous.txt').read_text()
+            time.sleep(0.3)
+        app.write_text(app.read_text().replace('{8}', '{10}'))
+        out = build(q, 'main')
+        assert 'appendix is being compiled by another process' in out, out
+        assert 'GDT: building appendix' not in out, out
+        out = build(q, 'appendix', ok=False)
+        assert 'appendix is already being compiled' in out, out
+    finally:
+        proc.terminate()
+        proc.wait(timeout=15)
+        log.close()
+    print('PASS: concurrent compilers of the same draft', flush=True)
 
     # Verify the actual biblatex resource metadata without requiring Biber.
     # A full bibliography build is handled by the optional sample check below.
