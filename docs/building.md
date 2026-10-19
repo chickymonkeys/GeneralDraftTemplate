@@ -31,15 +31,27 @@ latexmk -pdf online_appendix.tex
 latexmk -pdf submission.2026.tex
 ```
 
-For an existing copy of the old scaffold, bring over `gdt-names.tex`, `gdt-build.sty`, and the updated `latexmkrc`, merging any project-specific rc settings. In the manuscript, replace `\GDTExternalDocument{appendix.tex}{appendix}` with `\GDTAppendixDocument`; in the appendix, replace `\GDTExternalDocument{main.tex}{main}` with `\GDTMainDocument`. Update the combined root to load `gdt-build`, call `\GDTTrackDocument{\GDTMainBase}` and `\GDTTrackDocument{\GDTAppendixBase}`, and include `\GDTMainBase.pdf` followed by `\GDTAppendixBase.pdf`. The generic two-argument `\GDTExternalDocument{source.tex}{aux-basename}` remains available for other external documents; it still imports labels without a prefix and with `nocite`.
+For an existing copy of the old scaffold, bring over `gdt-names.tex`, `gdt-build.sty`, and the updated `latexmkrc`, merging any project-specific rc settings. In the manuscript, replace `\GDTExternalDocument{appendix.tex}{appendix}` with `\GDTAppendixDocument`; in the appendix, replace `\GDTExternalDocument{main.tex}{main}` with `\GDTMainDocument`. Update the combined root to load `gdt-build` and include `\GDTMainBase.pdf` followed by `\GDTAppendixBase.pdf`. Combined roots written for earlier versions also call `\GDTTrackDocument`; it now does nothing and can stay or go. The generic two-argument `\GDTExternalDocument{source.tex}{aux-basename}` remains available for other external documents; it imports labels without a prefix and with `nocite`, and no longer reads its first argument.
 
 ## Source roles, output names, and synchronization
 
 The source filename selects a role; `\jobname` does not. For example, `latexmk -pdf -jobname=output paper-v2.tex` selects the manuscript but writes `output.pdf` and `output.aux`. The callback synchronizes that auxiliary file to `paper-v2.aux` before and after each successful pdfLaTeX pass, where the appendix can find it. If the selected job's auxiliary file has disappeared, its stale canonical copy is removed before the companion is built. Companion jobs explicitly use their configured basenames, so that invocation still produces `online_appendix.pdf` and `online_appendix.aux`.
 
-Standalone builds run their companion with `GDT_XR_COMPANION` set to prevent recursive companion spawning. latexmk handles each child's bibliography and reruns. The combined build starts a normal manuscript build, including its companion flow, so labels converge in both directions before the two PDFs are attached in manuscript–appendix order. Child failures fail the parent build. A source outside the three configured roles compiles normally without a companion.
+## When the companion is rebuilt
 
-The mapping file, companion entry source, imported auxiliary file, and companion recorder inputs are build dependencies. Reading the companion `.fls` registers included sources and graphics as well, so their edits can trigger a standalone or combined rebuild. Generated auxiliary inputs are excluded from that transitive source tracking. The callback reloads and validates the mapping on each pass, including in a live `latexmk -pvc` session. Changing a companion name can take effect during that session; renaming the selected root requires a restart/root reselection. Keep latexmk's recorder enabled.
+Before each pdfLaTeX pass of a standalone document, the callback builds the companion only if the labels it imports can be stale:
+
+- the companion has no auxiliary file, or this job has not built it yet;
+- one of the companion's own inputs changed since this job built it: its entry file, included sources, graphics, styles, or the mapping;
+- the companion was built before this document had labels to import, as on a clean build, where latexmk starts from a dummy auxiliary file.
+
+Changes to the document being built, its labels included, never rebuild the companion. That breaks the cycle in which each document's auxiliary file made the other out of date, so an edit costs one document's passes. The price is that the companion PDF produced along the way can show this document's labels as they were when the companion last changed; building the companion itself, or the combined target, brings it up to date. The labels this document imports are always current.
+
+For each document it built, a job records the inputs it read, from its `.fls` recorder file, with their sizes, modification times, and MD5 checksums, in `<jobname>.gdt.aux` in the auxiliary directory. The extension makes Overleaf keep the file between compiles and lets the usual LaTeX ignore rules cover it; `latexmk -c` removes it. Companions are built with `GDT_XR_COMPANION` set, so they build no companion of their own. latexmk handles each child's bibliography and reruns, and a child failure fails the parent build.
+
+The combined build applies the same test to both documents, also counting changes to the labels each imports and missing PDFs, and repeats until neither needs a rebuild (at most four rounds) before attaching the PDFs in manuscript–appendix order. A source outside the three configured roles compiles normally without a companion.
+
+The mapping file and the companion's inputs are build dependencies of each pass: after latexmk's own dependency analysis, the callback adds the companion's inputs through latexmk's `after_xlatex_analysis` hook, so editing the other document starts a rebuild in a live `latexmk -pvc` session. TeX never opens those files, so each document's recorder file lists only what it reads. The hook needs latexmk 4.84 or later; with older versions, the companion is still refreshed on every pass of the selected document, but edits to the companion alone do not start one. The callback reloads and validates the mapping on each pass, including in a live `latexmk -pvc` session. Changing a companion name can take effect during that session; renaming the selected root requires a restart/root reselection. Keep latexmk's recorder enabled.
 
 ## Output and auxiliary directories
 
@@ -51,7 +63,13 @@ latexmk -pdf -outdir=build -auxdir=auxiliary -emulate-aux-dir paper-v2.tex
 
 Directory options are forwarded to children. With `-outdir=build`, PDFs and canonical auxiliaries live in `build/`. With separate directories, PDFs live in `build/`, canonical auxiliaries and recorder files in `auxiliary/`. On TeX Live, use latexmk's `-emulate-aux-dir` support (verified with latexmk 4.87); pdfLaTeX itself does not implement MiKTeX's separate aux-directory option. The callback exposes the final output directory to TeX's search path so the combined document can find companion PDFs even with separate auxiliary files. Preserve the project's existing `TEXINPUTS` settings.
 
-Do not run concurrent builds with the same jobname and directories: two independently selected roots using `-jobname=output` share files. Stop the old compiler before selecting another root, or use separate build directories. The configured canonical names remain independent of the selected output jobname.
+Each document has one build lock per auxiliary directory, held in the system's temporary directory. A latexmk process takes the lock of the root it compiles at its first pass and holds it until it exits, so a continuous session holds it for as long as it runs. While it does:
+
+- a build of the other document uses the labels this one already has and does not build it (`GDT: <name> is being compiled by another process`);
+- a second compiler of the same root waits briefly and then stops with `GDT: <name> is already being compiled in this output directory`;
+- a companion build in progress makes the root's own compiler wait for it.
+
+Continuous compilers of the manuscript and the appendix can therefore run side by side. Do not give two roots the same jobname in the same directories: with `-jobname=output`, two independently selected roots share files. Stop the old compiler before selecting another root, or use separate build directories. The configured canonical names remain independent of the selected output jobname.
 
 ## VimTeX and LazyVim
 
@@ -80,7 +98,7 @@ return {
 
 VimTeX selects pdfLaTeX from the magic comment. latexmk reads `latexmkrc` from the project root automatically; keep that behavior enabled. If your editor launches latexmk elsewhere, arrange to run from the project root or explicitly load that rc with `-r /absolute/project/latexmkrc`. For a separate aux directory, set `aux_dir = "auxiliary"` alongside `out_dir = "build"`; current VimTeX forwards `-auxdir=auxiliary` and `-emulate-aux-dir` itself.
 
-Open each configured root, run `:VimtexCompile`, and inspect `:VimtexInfo`: confirm the selected TeX root, latexmk compiler, build directory, and resulting PDF path. While editing a nested source, check that `:VimtexInfo` selects the wrapper named in its root comment. After renaming, stop the compiler (`:VimtexStop`), reopen/reselect the new root, and restart compilation. Clear stale files with `:VimtexClean` or the command-line cleanup described below when necessary. This guide does not change the user's editor configuration.
+You can keep a continuous compiler running for each document; each builds only itself while the other's compiler runs, and picks up the other's labels when they change. Open each configured root, run `:VimtexCompile`, and inspect `:VimtexInfo`: confirm the selected TeX root, latexmk compiler, build directory, and resulting PDF path. While editing a nested source, check that `:VimtexInfo` selects the wrapper named in its root comment. After renaming, stop the compiler (`:VimtexStop`), reopen/reselect the new root, and restart compilation. Clear stale files with `:VimtexClean` or the command-line cleanup described below when necessary. This guide does not change the user's editor configuration.
 
 ## Overleaf
 
@@ -89,6 +107,8 @@ Upload the entry files, `gdt-names.tex`, `latexmkrc`, style packages, bibliograp
 1. Set **Main document** in project settings to `paper-v2.tex`, then **Recompile** for the standalone manuscript.
 2. Select `online_appendix.tex` as Main document and recompile for the standalone appendix.
 3. Select `submission.2026.tex` as Main document and recompile for the combined output. Its callback builds both standalone PDFs automatically.
+
+Overleaf deletes most generated files before each compile but keeps `output.*`, `*.aux`, and `*.pdf`. The companion's auxiliary file and PDF and the job's `output.gdt.aux` state therefore survive, so recompiling the manuscript after editing only the manuscript does not rebuild the appendix. After the appendix changes, the next manuscript compile rebuilds it once, from scratch, because Overleaf deleted its other files. **Recompile from scratch** clears all of this and builds both documents again.
 
 Overleaf also allows recompiling an open independently compilable file containing a `\documentclass`; explicit Main document selection is clearest for wrappers. After a rename, update the setting and use **Recompile from scratch** from the Recompile menu if old cached auxiliaries persist. If compilation fails, inspect the child document's error in the build log rather than only the combined root's final error. Local `-jobname=output` tests emulate output naming; they do not substitute for a hosted Overleaf build.
 
@@ -148,7 +168,9 @@ Only the wrappers declare `\documentclass`. If retaining an existing body that c
 - **Configured companion source is missing:** the mapping and filenames disagree. Rename the actual entry file or correct the value. Check case on case-sensitive systems.
 - **References stay undefined:** ensure both sources load `gdt-build` and use the role helper, the referenced labels exist, and the child build succeeds. First child passes can warn about missing labels during a clean build; check the final PDFs. Imported labels have no prefix, so use distinct labels in the two documents.
 - **Wrong output or old name:** verify the selected root in VimTeX/Overleaf. Changing the mapping does not rename files or change an editor's selected root. Stop the previous compiler when changing jobname or directories.
-- **Included-source edits are missed:** keep `-recorder` enabled and the companion `.fls` files available. Rebuild once to refresh dependency lists after moving source files. The generic two-argument helper tracks only its specified entry source and auxiliary; use the role helpers for full template dependency tracking.
+- **Included-source edits are missed:** keep `-recorder` enabled and the companion `.fls` files available, and use latexmk 4.84 or later (`latexmk -v`) so the callback can add the companion's sources to each pass. Rebuild once to refresh dependency lists after moving source files. Companion builds and dependencies apply to the configured roles; the generic two-argument helper only imports labels.
+- **`is being compiled by another process`:** another latexmk is compiling the companion in the same directories, often a continuous compiler in another editor buffer. The build uses its current labels. Stop that compiler to let this build refresh the companion itself.
+- **`is already being compiled in this output directory`:** a continuous compiler of the same root is running, perhaps left over in another editor. Stop it, or build into another directory.
 - **Stale auxiliaries:** clean both standalone jobs in the same directories/options used for compilation, then rebuild the selected root. If you used an overridden jobname, clean that job too. Stop continuous compilation first. `-C` removes generated PDFs as well, so use it only where those are disposable.
 
 ```sh
@@ -157,8 +179,8 @@ latexmk -C -outdir=build -jobname=output paper-v2.tex
 latexmk -pdf -outdir=build submission.2026.tex
 ```
 
-When renaming, clean old jobs before moving their sources, or manually remove old generated auxiliaries (including the canonical `.aux` copy of a jobname override). Avoid deleting source files or figure PDFs. Direct pdfLaTeX validates the mapping and can import existing auxiliaries, but automatic companion generation, bibliography processing, synchronization, and convergence require latexmk.
+`latexmk -c` and `-C` also remove the job's `<jobname>.gdt.aux` state, so the next build rebuilds the companion once. When renaming, clean old jobs before moving their sources, or manually remove old generated auxiliaries (including the canonical `.aux` copy of a jobname override). Avoid deleting source files or figure PDFs. Direct pdfLaTeX validates the mapping and can import existing auxiliaries, but automatic companion generation, bibliography processing, synchronization, and convergence require latexmk.
 
 ## Regression checks
 
-Run `bash tests/test-build.sh`. It requires Bash, Python 3, latexmk, pdfLaTeX with biblatex, and Poppler's `pdftotext`/`pdfinfo`. It builds lightweight fixtures in temporary directories, checks labels in both directions and combined page order, exercises default/renamed roots with canonical/overridden jobnames and output/auxiliary directories, edits sources and the live mapping, and checks failures and nested bibliography resource paths. It never copies the tracked sample PDFs. If Biber is on `PATH`, it also builds the full sample in a temporary copy; otherwise that check is explicitly skipped. Full-template compilation needs all packages used by `preamble.sty`; interactive editor and hosted Overleaf checks require those environments.
+Run `bash tests/test-build.sh`. It requires Bash, Python 3, latexmk, pdfLaTeX with biblatex, and Poppler's `pdftotext`/`pdfinfo`. It builds lightweight fixtures in temporary directories, checks labels in both directions and combined page order, exercises default/renamed roots with canonical/overridden jobnames and output/auxiliary directories, edits sources and the live mapping, and checks failures and nested bibliography resource paths. It also checks that edits to one document leave its companion alone while edits to the companion's sources rebuild it, replays Overleaf's compile command and its deletion of generated files between compiles, and runs a second compiler beside a continuous one. It never copies the tracked sample PDFs. If Biber is on `PATH`, it also builds the full sample in a temporary copy; otherwise that check is explicitly skipped. Full-template compilation needs all packages used by `preamble.sty`; interactive editor and hosted Overleaf checks require those environments.
