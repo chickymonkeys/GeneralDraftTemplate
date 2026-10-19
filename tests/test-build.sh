@@ -3,7 +3,11 @@
 set -euo pipefail
 repo="$(dirname "$(dirname "$(realpath "$0")")")"
 exec python3 - "$repo" <<'PY'
+import fcntl
+import hashlib
+import os
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -82,6 +86,8 @@ def resolved(project, names, out='.', aux='.', job=None, role=0):
 
 with tempfile.TemporaryDirectory(prefix='gdt-build-') as tmp:
     root = pathlib.Path(tmp)
+    # Builds keep their lock files in the system's temporary directory.
+    os.environ['TMPDIR'] = tmp
     variants = [('main', 'appendix', 'combined'),
                 ('paper-v2', 'online_appendix', 'submission.2026')]
     count = 0
@@ -183,7 +189,8 @@ with tempfile.TemporaryDirectory(prefix='gdt-build-') as tmp:
     assert 'companion source appendix.tex is missing' in build(p, 'main', ok=False)
     shutil.copyfile(repo / 'tests/fixtures/appendix.tex', p / 'appendix.tex')
     (p / 'appendix.tex').write_text('\\documentclass{article}\n\\begin{document}\\undefinedcommand\\end{document}\n')
-    build(p, 'main', ok=False)
+    out = build(p, 'main')
+    assert 'GDT: appendix failed to build, so references to it may be missing' in out, out
     (p / 'other.tex').write_text('\\documentclass{article}\n\\begin{document}Other\\end{document}\n')
     build(p, 'other')
     assert not (p / 'appendix.pdf').exists()
@@ -328,6 +335,63 @@ with tempfile.TemporaryDirectory(prefix='gdt-build-') as tmp:
         proc.wait(timeout=15)
         log.close()
     print('PASS: concurrent compilers of the same draft', flush=True)
+
+    # An error in the companion does not stop this document, and the companion
+    # is built again once its source is fixed.
+    q = root / 'failed-companion'
+    fixture(q, variants[0])
+    build(q, 'main')
+    app = q / 'appendix.tex'
+    good = app.read_text()
+    app.write_text(good.replace('\\begin{document}', '\\begin{document}\\undefinedcommand'))
+    stamp = (q / 'main.pdf').stat().st_mtime_ns
+    out = build(q, 'main')
+    assert 'GDT: appendix failed to build' in out, out
+    assert (q / 'main.pdf').stat().st_mtime_ns != stamp
+    build(q, 'main')
+    app.write_text(good.replace('{6}', '{8}'))
+    out = build(q, 'main')
+    assert 'GDT: building appendix because appendix.tex changed' in out, out
+    assert 'Appendix reference: 9.' in text(q, 'main.pdf')
+    print('PASS: a failed companion does not stop this document', flush=True)
+
+    # A pass stopped mid-write leaves files cut off, and latexmk records the
+    # pass as failed. Starting the compiler again must repair and rebuild.
+    q = root / 'interrupted'
+    fixture(q, variants[0])
+    build(q, 'main')
+    for name in ('main.aux', 'main.pdf', 'appendix.aux'):
+        data = (q / name).read_bytes()
+        (q / name).write_bytes(data[:len(data) // 2].rstrip(b'\n') + b'{')
+    for name in ('main.fdb_latexmk', 'appendix.fdb_latexmk'):
+        fdb = q / name
+        fdb.write_text(re.sub(r'^(\["pdflatex"\] .*) 0$', r'\1 2', fdb.read_text(), flags=re.M))
+    out = build(q, 'main')
+    for name in ('main.aux', 'main.pdf', 'appendix.aux'):
+        assert f'GDT: removed {name}, which an interrupted pass left incomplete.' in out, out
+    resolved(q, variants[0])
+    print('PASS: files cut off by a stopped compiler are rebuilt', flush=True)
+
+    # A pass reads the other document's files only while no pass of it runs.
+    q = root / 'pass-lock'
+    fixture(q, variants[0])
+    build(q, 'appendix')
+    app = q / 'appendix.tex'
+    app.write_text(app.read_text().replace('{6}', '{8}'))
+    key = hashlib.md5(str((q / 'main.aux').resolve()).encode()).hexdigest()
+    with (root / f'gdt-{key}.pass.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        proc = subprocess.Popen(['latexmk', '-pdf', '-silent', '-interaction=nonstopmode',
+                                 '-halt-on-error', 'appendix.tex'], cwd=q, text=True,
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        time.sleep(3)
+        assert proc.poll() is None, proc.communicate()[0]
+        fcntl.flock(lock, fcntl.LOCK_UN)
+    out = proc.communicate(timeout=60)[0]
+    assert proc.returncode == 0, out
+    assert 'GDT: waiting for the current pass of main to finish.' in out, out
+    assert 'Manuscript reference: 1.' in text(q, 'appendix.pdf')
+    print('PASS: passes wait for the other document to finish writing', flush=True)
 
     # Verify the actual biblatex resource metadata without requiring Biber.
     # A full bibliography build is handled by the optional sample check below.
