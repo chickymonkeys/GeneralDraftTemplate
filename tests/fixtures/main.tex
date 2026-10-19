@@ -1,7 +1,7 @@
 % !TeX program = pdflatex
 \documentclass{article}
-\usepackage{gdt-build}
-\GDTAppendixDocument
+\usepackage{xr}
+\externaldocument[][nocite]{appendix}
 \begin{document}
 \input{body}
 Appendix reference: \ref{app:result}.
